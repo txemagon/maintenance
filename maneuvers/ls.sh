@@ -1,2 +1,0 @@
-ls
-exec bash
