@@ -1,5 +1,5 @@
 #/bin/bash
-# rcp_dir.sh
+# rcp_dir2f.sh
 # Oct, 2015. txema.gonz@gmail.com
 
 . lib/general.sh
@@ -14,7 +14,7 @@ b="bash -c "
 
 
 local_command="pushd LOCAL_DIR; cd ..;pwd=\`pwd\`; tar -c OPTION0 | pv --size \`du -s $pwd | cut -f1\` | pigz -5 | nc -l 8888; echo 'Back to: '; popd"
-remote_command="mkdir -p REMOTE_DIR; cd REMOTE_DIR; nc REMOTE_IP 8888 | pigz -d | tar xvf -"
+remote_command="mkdir -p REMOTE_DIR; cd REMOTE_DIR; nc REMOTE_IP 8888 > OPTION0.tar.gz"
 
 declare -A remote_dir
 
@@ -97,6 +97,7 @@ parse_dir $2 # Parse remote schema
 my_ip=$(my_IP)
 remote_command=${remote_command//REMOTE_DIR/${remote_dir[dir]}}
 remote_command=${remote_command//REMOTE_IP/$my_ip}
+remote_command=${remote_command//OPTION0/$last_dir}
 
 command+=$init_task$S
 command+="ssh -t ${remote_dir[user]}@${remote_dir[host]} "
