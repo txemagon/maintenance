@@ -1,0 +1,12 @@
+#!/bin/bash
+# programming_tools
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Maneuver to install needed programming software.
+# Could ve used in the following way:
+
+# ./remote_dop maneuvers/editor
+
+apt-get install vim build-essential g++ libncurses5-dev -y

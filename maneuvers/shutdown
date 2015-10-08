@@ -1,0 +1,12 @@
+#!/bin/bash
+# shutdown
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Maneuver to power off computers. Could be uses as:
+
+# ./remote_do maneuvers/editor
+
+shutdown -h now
+

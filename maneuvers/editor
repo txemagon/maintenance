@@ -1,0 +1,12 @@
+#!/bin/bash
+# editor
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Example maneuver to config default editor.
+# This file would be used, for instance:
+
+# ./remote_install maneuvers/editor
+
+update-alternatives --config editor

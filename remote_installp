@@ -1,0 +1,33 @@
+#!/bin/bash
+# remote_installp
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Executes simultanousley several processes
+# (ONE WINDOW EACH) in background.
+
+# Usage:   ./remote_installp <command_file>
+# Example: ./remote_installp maneuvers/editor
+
+# The example above forces you to use the install version 
+# since it needs to be feeded with user input for config options.
+
+# Note: Point with userhost.lst (symbolic link) to a file
+# containing the hosts
+
+terminal="gnome-terminal"
+option=" --tab -e "
+s="'"
+S="\""
+
+command=$terminal
+for ip in `cat userhost.lst`; do
+	command+=$option$S
+	command+="ssh -t root@$ip $(<$1)"
+	command+=$S
+done
+
+eval $command
+
+

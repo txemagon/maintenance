@@ -1,0 +1,20 @@
+#!/bin/bash
+# remote_do
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Executes simultanousley several processes in background.
+# Every command supplied feeds remote input, so there aren't
+# any interacting possibilities (no remote configure).
+
+# Usage:   ./remote_do <command_file>
+# Example: ./remote_do maneuvers/shutdown
+
+# Note: Point with userhost.lst (symbolic link) to a file
+# containing the hosts.
+
+for ip in `cat userhost.lst`; do
+	ssh root@$ip "bash -s" < $1 &
+done
+

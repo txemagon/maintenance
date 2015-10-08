@@ -1,0 +1,21 @@
+#!/bin/bash
+# remote_install
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Executes host after host several processes.
+
+# Usage:   ./remote_install <command_file>
+# Example: ./remote_install maneuvers/editor
+
+# The example above forces you to use the install version 
+# since it needs to be feeded with user input for config options.
+
+# Note: Point with userhost.lst (symbolic link) to a file
+# containing the hosts.
+
+for ip in `cat userhost.lst`; do
+	ssh -t root@$ip "$(<$1)"
+done
+
