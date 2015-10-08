@@ -4,8 +4,8 @@ Several bash scripts to admin a pool of computers.
 
 ## Installation
 
-Clone the repository, and add it to your path variable. Preferred dir: ~/bin
-Go under hosts dir and type in a file your hosts' IPs.
+Clone the repository, and add it to your PATH variable. Preferred dir: ~/bin
+Go under hosts dir and type inside a file all your hosts' IPs.
 Then, remove userhost.lst and create a symlink to your new file.
 
 ```bash
@@ -14,7 +14,7 @@ i@gnu$ ln -s hosts/my_hosts.lst userhost.lst
 
 ## Customization
 
-Install whatever you cant in one computer and copy the commands in a maneuver file.
+Install whatever you want in one computer and copy the commands in a maneuver file.
 
 ## Usage
 
@@ -30,7 +30,7 @@ You can choose one of the following commands:
 Where _do_ executes commands whithout interactive shell (you can not feed input on remote computers), but 
 has better perfomance than the _install_ family.
 
-May you'll want to do:
+May be you'll want to do:
 
 ```bash
 i@gnu$ ./remote_do maneuvers/shutdown
@@ -40,17 +40,15 @@ to poweroff all computers.
 
 Whenever you are coerced to feed input use the _install_ family.
 
-To select default editor, you have to use
-
+To select default editor, you'll have to use,
 ```bash
 i@gnu$ ./remote_install maneuvers/editor
 ```
-
 as long as you will be prompted for input.
 
 _p_ letter stands for parallel, and executes the task assigning one terminal tab per host.
 
-So, instead of last command, this
+So, instead of the last command, this
 
 ```bash
 i@gnu$ ./remote_installp maneuvers/editor
@@ -63,23 +61,30 @@ _remote_installp_ gives you the chance to type in one tab, copy text and paste i
 
 #### copy_credentials
 
-Since you are going to be _ssh_ing to multiple hosts, it is adviseable to copy your credentials as root 
-of the remote machine.
+Since you are going to be _sshing_ to multiple hosts, it is adviseable to copy your credentials as root 
+in the remote machine.
 
-For convinience, _copy_credentials_ is porvided.
+For convinience, _copy_credentials_ is provided.
 
-You can set up user and credentials variables at the top of the file, which default to root and id_rsa.pub by 
-default.
+You can set up user and credentials variables at the top of the file, which default to root and id_rsa.pub.
 
 #### rcp_dir
 
 Copies one directory recursively from local to remote host.
 
-In addition to installing software sometimes you need to copy big files from your local computer to a remote one.
-To increase speed rcp_dir uses _nc_ (netcat) to establish a pipe where parallel compression and decompression is 
-been taken at both sides of the pipe. Thus, you need to install _pigz_.
+Syntax:
 
-To use _rcp_dir_ you HAVE TO set IFACE variable to your net interface value (wlan0, eth0, etc). Use _ifconfig_ to 
+```bash
+i$gnu$ rcp_dir <local_dir_to_copy> [user]@<remote_host>:<remote_dir>
+
+When user not provided, it defaults to your current user in the local machine. Please, notice
+that the _at sign_ (@) is not optional.
+```
+
+In addition to installing software, sometimes you need to copy big files from your local computer to a remote one.  To increase speed rcp_dir uses _nc_ (netcat) to establish a pipe where parallel compression and decompression 
+occurs at both sides of the pipe. Thus, you'll need to install _pigz_.
+
+To use _rcp_dir_ you HAVE TO set IFACE variable, at the top of the file,  to your network interface value (wlan0, eth0, etc). Use _ifconfig_ to 
 find out.
 
 Use, 
