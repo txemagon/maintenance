@@ -1,0 +1,28 @@
+#!/bin/bash
+# do_in
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Executes a maneuver on a single machine
+
+# Usage:   ./do_in [<user>]@<host> <maneuver> [param]* 
+# Example: ./do_in txema@192.168.1.2 maneuvers/execute_as jorge firefox
+#
+# Which will ssh -X in 192.168.1.2 as txema and will assign txema's display 
+# authorization to user jorge, and finally will open jorge's firefox.
+
+sshing=$1
+shift
+maneuver="$(<$1)" ## Load maneuver file as whole.
+shift
+
+declare -i counter=0
+while [[ $@ > 0 ]];
+do
+    ((counter++))
+    maneuver=${maneuver//\$$counter/$1}
+    shift
+done
+
+ssh -Xt $sshing $maneuver
