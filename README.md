@@ -121,7 +121,7 @@ authorization to user _anotherone_, and finally will open _anotherone's_ firefox
 #### execute_as
 
 Maneuver that locally executes one program as another user. There are several techniques to achieve
-this, but certainly, this is amazing because can ride an ssh conection.
+this, but certainly, this is amazing because it can ride an ssh conection.
 
 Usage:
 
