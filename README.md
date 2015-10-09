@@ -4,8 +4,10 @@ Several bash scripts to admin a pool of computers.
 
 ## Installation
 
-Clone the repository, and add it to your PATH variable. Preferred dir: ~/bin
-Go under hosts dir and type inside a file all your hosts' IPs.
+Clone the repository, and add it to your PATH variable. 
+Preferred dir: ~/bin
+
+Then, go under hosts dir and type inside a file all your hosts' IPs.
 Then, remove userhost.lst and create a symlink to your new file.
 
 ```bash
@@ -93,6 +95,35 @@ i@gnu$ rcp_dir --help
 ```
 for further information.
 
+
 #### rcp_dir2f
 
 Tars and zips one local directory an copies it, using netcat to a remote host. See _rcp_dir_ for further information.
+
+
+#### do_in
+
+Executes a maneuver on a single remote machine.
+
+Usage:   
+
+    ./do_in [<user>]@<host> <maneuver> [param]* 
+
+Example: 
+```bash
+./do_in my_user@192.168.1.2 maneuvers/execute_as anotherone firefox
+```
+
+Which will ssh -X in 192.168.1.2 as _my_user_ and will assign _my_user's_ display 
+authorization to user _anotherone_, and finally will open _anotherone's_ firefox.
+
+
+#### execute_as
+
+Maneuver that locally executes one program as another user. There are several techniques to achieve
+this, but certainly, this is amazing because can ride an ssh conection.
+
+Usage:
+
+    exectue_as <user> <program>
+  
