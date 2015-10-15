@@ -16,6 +16,7 @@
 # containing the hosts.
 
 for ip in `cat userhost.lst`; do
-	ssh -t root@$ip "$(<$1)"
+    toilet -f term -F border --gay $ip
+    ssh -t root@$ip "$(<$1)"
 done
 
