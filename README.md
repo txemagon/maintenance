@@ -1,3 +1,7 @@
+System Wide and User config
+
+todo: create script for making per user dir structure.
+
 # Maintenance
 
 Several bash scripts to admin a pool of computers.
