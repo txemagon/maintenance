@@ -7,14 +7,81 @@
 # Executes simultanousley several processes in background.
 # Every command supplied feeds remote input, so there aren't
 # any interacting possibilities (no remote configure).
+# If you want to answer config questions use remote_install,
+# instead.
 
-# Usage:   ./remote_do <command_file>
-# Example: ./remote_do maneuvers/shutdown
+# Usage:   remote_do <command_file>
+# Example: remote_do shutdown
 
 # Note: Point with userhost.lst (symbolic link) to a file
 # containing the hosts.
 
-for ip in `cat userhost.lst`; do
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Executes a bash file in multiple remotes machine.
+
+USAGE:
+    $NTT_CMD_NAME [<options>] [<user_host_file>=userhost.lst] <maneuver_file> [<maneuver file parameters>]
+
+    Maneuvers files can be located in system wide config (for all users) inside
+    $NTT_SYS_MNVR or in a per user configuration inside
+    $NTT_LOC_MNVR
+
+    User host file is a list of host names or ip's specifying target machines.
+    When any file is specified the userhost.lst is assumed to exist either in:
+
+         - $NTT_LOC_MNVR
+         - $NTT_SYS_MNVR
+
+    respectively.
+
+OPTIONS:
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLE: do_in localhost greet
+
+EOF
+}
+
+hostfile=userhost.lst
+
+# read the options
+TEMP=`getopt -o hVf: --long help,version,file: -n \'$NTT_CMD_NAME\' -- "$@"`
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -f|--file) case "$2" in
+            "") shift 2 ;;
+            *) hostfile=$2 ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+if [[ $# -lt 2 ]];
+then
+    echo "Too few arguments."
+    echo
+    display_usage >&2
+    exit 1
+fi
+
+
+for ip in `cat $hostfile`; do
     toilet -f term -F border --gay $ip
     ssh root@$ip "bash -s" < $1 &
 done

@@ -19,5 +19,8 @@ include_sanitized () {
     . $configfile
 }
 
+display_version () {
+    echo "$NTT_CMD_NAME - version $VERSION"
+}
 
 

@@ -7,19 +7,18 @@
 # Executes a maneuver on a single machine
 
 # Usage:   do_in [<user>]@<host> <maneuver> [param]*
-# Example: do_in txema@192.168.1.2 maneuvers/execute_as jorge firefox
+# Example: do_in txema@192.168.1.2 execute_as jorge firefox
 #
 # Which will ssh -X in 192.168.1.2 as txema and will assign txema's display
 # authorization to user jorge, and finally will open jorge's firefox.
+#
+# Check installation typing:
+#          do_in localhost greet
+
 
 VERSION=1.0
 
 . /usr/share/nettenance/general.sh
-
-display_version () {
-    echo "$NTT_CMD_NAME - version $VERSION"
-}
-
 
 display_usage () {
     cat <<EOF
@@ -47,7 +46,7 @@ EOF
 
 
 # read the options
-TEMP=`getopt -o hV --long help,version -n 'do_in' -- "$@"`
+TEMP=`getopt -o hV --long help,version -n \'$NTT_CMD_NAME\' -- "$@"`
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
