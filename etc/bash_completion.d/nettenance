@@ -1,0 +1,44 @@
+# bash completion for nettenance package
+
+. /usr/share/nettenance/global_variables
+
+have do_in &&
+_do_in()
+{
+    COMPREPLY=()
+    local cur prev
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        -h|-V)
+            return 0
+            ;;
+    esac
+#            COMPREPLY=( $( compgen -W "$( awk \
+#                '{ if ($3 ~ /^fuse\./) print $2 }' /etc/mtab 2>/dev/null )" \
+#                -- "$cur" ) )
+#            return 0
+#            ;;
+
+    if [[ "$cur" == -* ]] ; then
+        COMPREPLY=( $( compgen -W '-h -V' -- "$cur" ) )
+    else
+         case $COMP_CWORD in
+             1) _known_hosts ;;
+             2) COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) ) ;;
+#             *)
+#                 _known_hosts
+#                 _filedir
+#                 ;;
+         esac
+    fi
+} &&
+complete -F _do_in do_in
+
+# Local variables:
+# mode: shell-script
+# sh-basic-offset: 4
+# sh-indent-comment: t
+# indent-tabs-mode: nil
+# End:
+# ex: ts=4 sw=4 et filetype=sh
