@@ -26,21 +26,24 @@ display_usage () {
     $NTT_CMD_NAME v$VERSION  -  Executes a bash file in multiple remotes machine.
 
 USAGE:
-    $NTT_CMD_NAME [<options>] [<user_host_file>=userhost.lst] <maneuver_file> [<maneuver file parameters>]
+    $NTT_CMD_NAME [<options>] <maneuver_file> [<maneuver file parameters>]
 
     Maneuvers files can be located in system wide config (for all users) inside
     $NTT_SYS_MNVR or in a per user configuration inside
     $NTT_LOC_MNVR
 
-    User host file is a list of host names or ip's specifying target machines.
-    When any file is specified the userhost.lst is assumed to exist either in:
-
-         - $NTT_LOC_MNVR
-         - $NTT_SYS_MNVR
-
-    respectively.
-
 OPTIONS:
+    -f, --file:
+          -f {<user_host_file>=userhost.lst}
+          User host file is a list of host names or ip's specifying target machines.
+          When any file is specified, 'userhost.lst' is assumed to exist either in:
+
+               - $NTT_LOC_MNVR
+               - $NTT_SYS_MNVR
+
+          respectively. It is a good idea to keep separate lists of IPs under ~/.nettenance/hosts
+          and link ~/.nettenance/userhost.lst to point to the desired environment.
+
     -h, --help
           Shows usage.
 
@@ -54,11 +57,14 @@ EOF
 
 hostfile=userhost.lst
 
+
 # read the options
-TEMP=`getopt -o hVf: --long help,version,file: -n \'$NTT_CMD_NAME\' -- "$@"`
+TEMP=`getopt -o hVf: --long help,version,file: -n $NTT_CMD_NAME -- "$@"`
+
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
+
 while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
@@ -72,17 +78,14 @@ while true ; do
     esac
 done
 
-if [[ $# -lt 2 ]];
-then
-    echo "Too few arguments."
-    echo
-    display_usage >&2
-    exit 1
-fi
+hostfile=$(look_for $hostfile HOST)
+ensure_args 1 $#
+check_existence_of $hostfile
 
+maneuver=$(look_for $1 MNVR)
 
 for ip in `cat $hostfile`; do
     toilet -f term -F border --gay $ip
-    ssh root@$ip "bash -s" < $1 &
+    ssh root@$ip "bash -s" < $maneuver &
 done
 

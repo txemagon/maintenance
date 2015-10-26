@@ -35,6 +35,37 @@ _do_in()
 } &&
 complete -F _do_in do_in
 
+
+have remote_do &&
+_remote_do()
+{
+    COMPREPLY=()
+    local cur prev
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        -h|-V)
+            return 0
+            ;;
+        -f|--file)
+            COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_HOST; ls $NTT_LOC_HOST) 2>/dev/null`" -- "$cur" ) )
+            return 0
+            ;;
+        *)
+            COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) )
+            return 0
+            ;;
+
+    esac
+    if [[ "$cur" == --* ]] ; then
+        COMPREPLY=( $( compgen -W '--help --version --file' -- "$cur" ) )
+    elif [[ "$cur" == -* ]] ; then
+        COMPREPLY=( $( compgen -W '-h -V -f' -- "$cur" ) )
+    fi
+} &&
+complete -F _remote_do remote_do
+
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4

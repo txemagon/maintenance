@@ -59,8 +59,13 @@ while true ; do
     esac
 done
 
-ensure_args 2 $#
-
+if [[ $# -lt 2 ]];
+then
+    echo "Too few arguments." >&2
+    echo >&2
+    display_usage >&2
+    exit 1
+fi
 sshing=$1         ## Host to ssh
 shift
 maneuver=$1

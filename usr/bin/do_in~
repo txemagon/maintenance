@@ -59,7 +59,7 @@ while true ; do
     esac
 done
 
-ensure_args 2 $#
+ensure_args 2
 
 sshing=$1         ## Host to ssh
 shift

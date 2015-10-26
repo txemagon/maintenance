@@ -3,6 +3,4 @@ NTT_SYS_CONF=/etc/nettenance
 NTT_LOC_CONF=~/.nettenance
 NTT_SYS_MNVR=$NTT_SYS_CONF/maneuvers
 NTT_LOC_MNVR=$NTT_LOC_CONF/maneuvers
-NTT_SYS_HOST=$NTT_SYS_CONF/hosts
-NTT_LOC_HOST=$NTT_LOC_CONF/hosts
 

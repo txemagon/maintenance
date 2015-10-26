@@ -23,7 +23,7 @@ customize:
 	mkdir ~/.nettenance/repository
 
 decustomize:
-	rmdir ~/.nettenance/hosts
+      rmdir ~/.nettenance/hosts
 	rmdir ~/.nettenance/maneuvers
 	rmdir ~/.nettenance/repository
 	rmdir ~/.nettenance
