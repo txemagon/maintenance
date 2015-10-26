@@ -3,6 +3,9 @@
 install-test:
 	ln -sf `pwd`/usr/bin/do_in /usr/bin/do_in
 	ln -sf `pwd`/usr/bin/remote_do /usr/bin/remote_do
+	ln -sf `pwd`/usr/bin/remote_dop /usr/bin/remote_dop
+	ln -sf `pwd`/usr/bin/remote_install /usr/bin/remote_install
+	ln -sf `pwd`/usr/bin/remote_installp /usr/bin/remote_installp
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance
@@ -12,6 +15,9 @@ install-test:
 uninstall-test:
 	rm /usr/bin/do_in
 	rm /usr/bin/remote_do
+	rm /usr/bin/remote_dop
+	rm /usr/bin/remote_install
+	rm /usr/bin/remote_installp
 	rm /etc/bash_completion.d/nettenance
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance

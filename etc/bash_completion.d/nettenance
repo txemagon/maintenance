@@ -52,19 +52,24 @@ _remote_do()
             return 0
             ;;
         *)
-            COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) )
+            if [[ "$cur" == --* ]] ; then
+                COMPREPLY=( $( compgen -W '--help --version --file' -- "$cur" ) )
+            elif [[ "$cur" == -* ]] ; then
+                COMPREPLY=( $( compgen -W '-h -V -f' -- "$cur" ) )
+            else
+                COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) )
+            fi
             return 0
             ;;
 
     esac
-    if [[ "$cur" == --* ]] ; then
-        COMPREPLY=( $( compgen -W '--help --version --file' -- "$cur" ) )
-    elif [[ "$cur" == -* ]] ; then
-        COMPREPLY=( $( compgen -W '-h -V -f' -- "$cur" ) )
-    fi
+    
 } &&
 complete -F _remote_do remote_do
 
+have remote_dop && complete -F _remote_do remote_dop
+have remote_install && complete -F _remote_do remote_install
+have remote_installp && complete -F _remote_do remote_installp
 
 # Local variables:
 # mode: shell-script

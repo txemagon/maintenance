@@ -6,8 +6,8 @@
 
 # Executes host after host several processes.
 
-# Usage:   ./remote_install <command_file>
-# Example: ./remote_install maneuvers/editor
+# Usage:   remote_install <command_file>
+# Example: remote_install editor
 
 # The example above forces you to use the install version 
 # since it needs to be feeded with user input for config options.
@@ -15,8 +15,78 @@
 # Note: Point with userhost.lst (symbolic link) to a file
 # containing the hosts.
 
-for ip in `cat userhost.lst`; do
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Executes a bash installation file in multiple remotes machine.
+                                It's possible to answer installation remote questions.
+
+USAGE:
+    $NTT_CMD_NAME [<options>] <maneuver_file> [<maneuver file parameters>]
+
+    Maneuvers files can be located in system wide config (for all users) inside
+    $NTT_SYS_MNVR or in a per user configuration inside
+    $NTT_LOC_MNVR
+
+OPTIONS:
+    -f, --file:
+          -f {<user_host_file>=userhost.lst}
+          User host file is a list of host names or ip's specifying target machines.
+          When any file is specified, 'userhost.lst' is assumed to exist either in:
+
+               - $NTT_LOC_MNVR
+               - $NTT_SYS_MNVR
+
+          respectively. It is a good idea to keep separate lists of IPs under ~/.nettenance/hosts
+          and link ~/.nettenance/userhost.lst to point to the desired environment.
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLE: do_in localhost greet
+
+EOF
+}
+
+hostfile=userhost.lst
+
+
+# read the options
+TEMP=`getopt -o hVf: --long help,version,file: -n $NTT_CMD_NAME -- "$@"`
+
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -f|--file) case "$2" in
+            "") shift 2 ;;
+            *) hostfile=$2 ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+hostfile=$(look_for $hostfile HOST)
+ensure_args 1 $#
+check_existence_of $hostfile
+
+maneuver=$(look_for $1 MNVR)
+
+
+for ip in `cat $hostfile`; do
     toilet -f term -F border --gay $ip
-    ssh -t root@$ip "$(<$1)"
+    ssh -t root@$ip "$(<$maneuver)"
 done
 
