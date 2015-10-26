@@ -1,15 +1,16 @@
 #!/bin/bash
-# push_all
+# remote-install
 
 # Oct, 2015, txema.gonz@gmail.com
 # GNU GENERAL PUBLIC LICENSE, Version 2
 
-# Pushes all the files inside <repository> in all the userhost.lst
+# Executes host after host several processes.
 
-# Usage: push_all <repository>
-# Example: push_all inf1-ubuntu-14.04
+# Usage:   remote-install <command_file>
+# Example: remote-install editor
 
-
+# The example above forces you to use the install version
+# since it needs to be feeded with user input for config options.
 
 # Note: Point with userhost.lst (symbolic link) to a file
 # containing the hosts.
@@ -21,19 +22,19 @@ VERSION=1.0
 display_usage () {
     cat <<EOF
 
-    $NTT_CMD_NAME v$VERSION  -  Push all the files in a repository dir inside the
-                                host machines.
+    $NTT_CMD_NAME v$VERSION  -  Executes a bash installation file in multiple remotes machine.
+                                It's possible to answer installation remote questions.
 
 USAGE:
-    $NTT_CMD_NAME [<options>] <repository_dir>
+    $NTT_CMD_NAME [<options>] <maneuver_file> [<maneuver file parameters>]
 
-    Repositories can be located in system wide config (for all users) inside
-    $NTT_SYS_REPO or in a per user configuration inside
-    $NTT_LOC_REPO
+    Maneuvers files can be located in system wide config (for all users) inside
+    $NTT_SYS_MNVR or in a per user configuration inside
+    $NTT_LOC_MNVR
 
 OPTIONS:
-    -f, --file:
-          -f {<user_host_file>=userhost.lst}
+    -H, --hosts:
+          -H {<user_host_file>=userhost.lst}
           User host file is a list of host names or ip's specifying target machines.
           When any file is specified, 'userhost.lst' is assumed to exist either in:
 
@@ -49,7 +50,7 @@ OPTIONS:
     -V, --version
           Displays program version.
 
-EXAMPLE: $NTT_CMD_NAME localhost greet
+EXAMPLE:  $NTT_CMD_NAME greet
 
 EOF
 }
@@ -58,7 +59,7 @@ hostfile=userhost.lst
 
 
 # read the options
-TEMP=`getopt -o hVf: --long help,version,file: -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVH: --long help,version,hosts: -n $NTT_CMD_NAME -- "$@"`
 
 eval set -- "$TEMP"
 
@@ -68,7 +69,7 @@ while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
         -V|--version) display_version; exit 0;;
-        -f|--file) case "$2" in
+        -h|--hosts) case "$2" in
             "") shift 2 ;;
             *) hostfile=$2 ; shift 2 ;;
         esac ;;
@@ -78,23 +79,14 @@ while true ; do
 done
 
 hostfile=$(look_for $hostfile HOST)
+ensure_args 1 $#
 check_existence_of $hostfile
 
-ensure_args 1 $#
-repository=$(find_dir $1 REPO)
-check_dir "$repository"
+maneuver=$(look_for $1 MNVR)
 
-echo "You are about to make changes in remote config files. "
-read -p "Are you sure? (y/n) " -n 1 -r
-echo    # (optional) move to a new line
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Nothing changed. Goodbye!"
-    exit 0
-fi
 
-echo "Starting..."
 for ip in `cat $hostfile`; do
-   toilet -f term -F border --gay  "$ip"
-   rsync -avz  $repository/ root@$ip:/
+    toilet -f term -F border --gay $ip
+    ssh -t root@$ip "$(<$maneuver)"
 done
+

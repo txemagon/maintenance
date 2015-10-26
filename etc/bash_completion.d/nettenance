@@ -2,7 +2,7 @@
 
 . /usr/share/nettenance/global_variables
 
-have do_in &&
+have do-in &&
 _do_in()
 {
     COMPREPLY=()
@@ -33,10 +33,10 @@ _do_in()
          esac
     fi
 } &&
-complete -F _do_in do_in
+complete -F _do_in do-in
 
 
-have remote_do &&
+have remote-do &&
 _file_mnvr()
 {
     COMPREPLY=()
@@ -47,15 +47,15 @@ _file_mnvr()
         -h|-V)
             return 0
             ;;
-        -f|--file)
+        -H|--hosts)
             COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_HOST; ls $NTT_LOC_HOST) 2>/dev/null`" -- "$cur" ) )
             return 0
             ;;
         *)
             if [[ "$cur" == --* ]] ; then
-                COMPREPLY=( $( compgen -W '--help --version --file' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '--help --version --hosts' -- "$cur" ) )
             elif [[ "$cur" == -* ]] ; then
-                COMPREPLY=( $( compgen -W '-h -V -f' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '-h -V -H' -- "$cur" ) )
             else
                 COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) )
             fi
@@ -65,12 +65,13 @@ _file_mnvr()
     esac
 
 } &&
-complete -F _file_mnvr remote_do
+complete -F _file_mnvr remote-do
 
-have remote_dop && complete -F _file_mnvr remote_dop
-have remote_install && complete -F _file_mnvr remote_install
-have remote_installp && complete -F _file_mnvr remote_installp
-have push_all &&
+have remote-dop && complete -F _file_mnvr remote-dop
+have remote-install && complete -F _file_mnvr remote-install
+have remote-installp && complete -F _file_mnvr remote-installp
+
+have push-all &&
 _file_repo()
 {
     COMPREPLY=()
@@ -81,15 +82,15 @@ _file_repo()
         -h|-V)
             return 0
             ;;
-        -f|--file)
+        -H|--hosts)
             COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_HOST; ls $NTT_LOC_HOST) 2>/dev/null`" -- "$cur" ) )
             return 0
             ;;
         *)
             if [[ "$cur" == --* ]] ; then
-                COMPREPLY=( $( compgen -W '--help --version --file' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '--help --version --hosts' -- "$cur" ) )
             elif [[ "$cur" == -* ]] ; then
-                COMPREPLY=( $( compgen -W '-h -V -f' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '-h -V -H' -- "$cur" ) )
             else
                 COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_REPO; ls $NTT_LOC_REPO) 2>/dev/null`" -- "$cur" ) )
             fi
@@ -99,7 +100,45 @@ _file_repo()
     esac
 
 } &&
-complete -F _file_repo push_all
+complete -F _file_repo push-all
+
+have copy-credentials &&
+_copy_credentials()
+{
+    COMPREPLY=()
+    local cur prev
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        -h|-V)
+            return 0
+            ;;
+        -H|--hosts)
+            COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_HOST; ls $NTT_LOC_HOST) 2>/dev/null`" -- "$cur" ) )
+            return 0
+            ;;
+        -u|--user)
+            COMPREPLY=( $( compgen -u -- $cur ) )
+            return 0
+            ;;
+         -i|--identity)
+            _filedir
+            return 0
+            ;;
+ 
+        *)
+            if [[ "$cur" == --* ]] ; then
+                COMPREPLY=( $( compgen -W '--help --version --hosts --user --identity' -- "$cur" ) )
+            elif [[ "$cur" == -* ]] ; then
+                COMPREPLY=( $( compgen -W '-h -V -H -u -i' -- "$cur" ) )
+            fi
+            return 0
+            ;;
+    esac
+
+} &&
+complete -F _copy_credentials copy-credentials
+
 
 # Local variables:
 # mode: shell-script

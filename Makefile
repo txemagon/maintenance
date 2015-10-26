@@ -3,12 +3,13 @@ SHELL := /bin/bash
 .PHONY: install-test post-install uninstall-test customize decustomize
 
 install-test:
-	ln -sf `pwd`/usr/bin/do_in /usr/bin/do_in
-	ln -sf `pwd`/usr/bin/remote_do /usr/bin/remote_do
-	ln -sf `pwd`/usr/bin/remote_dop /usr/bin/remote_dop
-	ln -sf `pwd`/usr/bin/remote_install /usr/bin/remote_install
-	ln -sf `pwd`/usr/bin/remote_installp /usr/bin/remote_installp
-	ln -sf `pwd`/usr/sbin/push_all /usr/sbin/push_all
+	ln -sf `pwd`/usr/bin/do-in /usr/bin/do-in
+	ln -sf `pwd`/usr/bin/remote-do /usr/bin/remote-do
+	ln -sf `pwd`/usr/bin/remote-dop /usr/bin/remote-dop
+	ln -sf `pwd`/usr/bin/remote-install /usr/bin/remote-install
+	ln -sf `pwd`/usr/bin/remote-installp /usr/bin/remote-installp
+	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all
+	ln -sf `pwd`/usr/sbin/copy-credentials /usr/sbin/copy-credentials
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance
@@ -19,12 +20,13 @@ install-test:
 
 
 uninstall-test:
-	rm /usr/bin/do_in
-	rm /usr/bin/remote_do
-	rm /usr/bin/remote_dop
-	rm /usr/bin/remote_install
-	rm /usr/bin/remote_installp
-	rm /usr/sbin/push_all
+	rm /usr/bin/do-in
+	rm /usr/bin/remote-do
+	rm /usr/bin/remote-dop
+	rm /usr/bin/remote-install
+	rm /usr/bin/remote-installp
+	rm /usr/sbin/push-all
+	rm /usr/sbin/copy-credentials
 	rm /etc/bash_completion.d/nettenance
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
