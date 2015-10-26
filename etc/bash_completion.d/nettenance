@@ -37,7 +37,7 @@ complete -F _do_in do_in
 
 
 have remote_do &&
-_remote_do()
+_file_mnvr()
 {
     COMPREPLY=()
     local cur prev
@@ -63,13 +63,43 @@ _remote_do()
             ;;
 
     esac
-    
-} &&
-complete -F _remote_do remote_do
 
-have remote_dop && complete -F _remote_do remote_dop
-have remote_install && complete -F _remote_do remote_install
-have remote_installp && complete -F _remote_do remote_installp
+} &&
+complete -F _file_mnvr remote_do
+
+have remote_dop && complete -F _file_mnvr remote_dop
+have remote_install && complete -F _file_mnvr remote_install
+have remote_installp && complete -F _file_mnvr remote_installp
+have push_all &&
+_file_repo()
+{
+    COMPREPLY=()
+    local cur prev
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+        -h|-V)
+            return 0
+            ;;
+        -f|--file)
+            COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_HOST; ls $NTT_LOC_HOST) 2>/dev/null`" -- "$cur" ) )
+            return 0
+            ;;
+        *)
+            if [[ "$cur" == --* ]] ; then
+                COMPREPLY=( $( compgen -W '--help --version --file' -- "$cur" ) )
+            elif [[ "$cur" == -* ]] ; then
+                COMPREPLY=( $( compgen -W '-h -V -f' -- "$cur" ) )
+            else
+                COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_REPO; ls $NTT_LOC_REPO) 2>/dev/null`" -- "$cur" ) )
+            fi
+            return 0
+            ;;
+
+    esac
+
+} &&
+complete -F _file_repo push_all
 
 # Local variables:
 # mode: shell-script

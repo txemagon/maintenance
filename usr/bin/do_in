@@ -39,7 +39,7 @@ OPTIONS:
     -V, --version
           Displays program version.
 
-EXAMPLE: do_in localhost greet
+EXAMPLE: $NTT_CMD_NAME localhost greet
 
 EOF
 }
