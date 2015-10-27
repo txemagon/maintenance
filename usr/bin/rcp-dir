@@ -6,9 +6,6 @@ VERSION=1.0
 
 . /usr/share/nettenance/general.sh
 
-
-IFACE="wlan0"
-
 command="gnome-terminal"
 init_task=" --tab -e "
 S="\""
@@ -26,12 +23,6 @@ display_usage() {
     echo "current user is used when not providing any."
     echo -e "\nExample:\n $0 mapa/ @172.17.1.200:/var/www"
 }
-
-# find my ip given iface
-my_IP() {
-    ifconfig $IFACE | grep 'inet:' | cut -d: -f2 | awk '{print $1}'
-}
-
 
 # Fill in remote_dir fields
 parse_dir() {
@@ -68,7 +59,8 @@ show_dir() {
 my_ip () {
     ip -o route get ${remote_dir[host]} | \
     sed -n 's/.* src//p' - | \
-    sed -n  's/\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/\nip&\n/gp' - \ | grep ip | sed 's/ip//'| sort | uniq
+    sed -n  's/\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/\nip&\n/gp' - | \
+    grep ip | sed 's/ip//'| sort | uniq
 }
 
 # Check number of params
@@ -112,4 +104,4 @@ command+="; exec bash"$s$S
 
 # Run everything
 echo "Copying ${local_dir}: `du -sh $local_dir | cut -f1`"
-#eval $command
+eval $command
