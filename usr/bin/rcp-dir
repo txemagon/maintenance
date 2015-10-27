@@ -1,8 +1,11 @@
-#/bin/bash
-# rcp_dir
+#!/bin/bash
+# rcp-dir
 # Oct, 2015. txema.gonz@gmail.com
 
-. lib/general.sh
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
 
 IFACE="wlan0"
 
@@ -11,7 +14,6 @@ init_task=" --tab -e "
 S="\""
 s="'"
 b="bash -c "
-
 
 local_command="pushd LOCAL_DIR; cd ..;pwd=\`pwd\`; tar -c OPTION0 | pv --size \`du -s $pwd | cut -f1\` | pigz -5 | nc -l 8888; echo 'Back to: '; popd"
 remote_command="mkdir -p REMOTE_DIR; cd REMOTE_DIR; nc REMOTE_IP 8888 | pigz -d | tar xvf -"
@@ -63,6 +65,11 @@ show_dir() {
     echo "Dir : ${remote_dir[dir]} "
 }
 
+my_ip () {
+    ip -o route get ${remote_dir[host]} | \
+    sed -n 's/.* src//p' - | \
+    sed -n  's/\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/\nip&\n/gp' - \ | grep ip | sed 's/ip//'| sort | uniq
+}
 
 # Check number of params
 if [ $# -le 1 ]
@@ -105,4 +112,4 @@ command+="; exec bash"$s$S
 
 # Run everything
 echo "Copying ${local_dir}: `du -sh $local_dir | cut -f1`"
-eval $command
+#eval $command

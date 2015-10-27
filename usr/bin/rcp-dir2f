@@ -1,8 +1,10 @@
-#/bin/bash
-# rcp_dir2f
+#!/bin/bash
+# rcp-dir2f
 # Oct, 2015. txema.gonz@gmail.com
 
-. lib/general.sh
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
 
 IFACE="wlan0"
 
