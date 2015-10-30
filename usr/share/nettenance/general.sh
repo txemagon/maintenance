@@ -1,4 +1,3 @@
-#!/bin/bash
 # general.sh
 
 NTT_CMD_NAME=$(basename "$0")
@@ -9,3 +8,6 @@ NTT_SHARED_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $NTT_SHARED_DIR/config.sh
 . $NTT_SHARED_DIR/strings.sh
 . $NTT_SHARED_DIR/arguments.sh
+
+# Libraries
+. $NTT_SHARED_DIR/networking/general.sh

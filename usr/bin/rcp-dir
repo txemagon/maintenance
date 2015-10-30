@@ -2,6 +2,8 @@
 # rcp-dir
 # Oct, 2015. txema.gonz@gmail.com
 
+
+
 VERSION=1.0
 
 . /usr/share/nettenance/general.sh
@@ -12,74 +14,83 @@ S="\""
 s="'"
 b="bash -c "
 
+port=8888
+
 local_command="pushd LOCAL_DIR; cd ..;pwd=\`pwd\`; tar -c OPTION0 | pv --size \`du -s $pwd | cut -f1\` | pigz -5 | nc -l 8888; echo 'Back to: '; popd"
 remote_command="mkdir -p REMOTE_DIR; cd REMOTE_DIR; nc REMOTE_IP 8888 | pigz -d | tar xvf -"
 
-declare -A remote_dir
+declare -A src_uri
+declare -A target_uri
 
-display_usage() {
-    echo "Copies a whole dir into another host"
-    echo -e "\nUsage:\n $0 <local dir> [user]@<host>:<remote dir>"
-    echo "current user is used when not providing any."
-    echo -e "\nExample:\n $0 mapa/ @172.17.1.200:/var/www"
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Copies one dir from one host to another.
+
+USAGE:
+    $NTT_CMD_NAME [<options>] <src_uri> <target_uri>
+
+    URIs are can use the following fields:
+
+    [<protocol>://]<user>:<password>@host:port/path/
+
+    Protocol is never used since setup connection is made via ssh
+
+OPTIONS:
+    -p, --port:
+          Port used to configure netcat and start copying.
+          Default port is 8888.
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLES:
+
+    $NTT_CMD_NAME root@172.17.1.20/var/www/mempleo.es root@172.17.1.200/var/www
+    $NTT_CMD_NAME ./src root:my_pass@172.17.1.200/var/www
+
+EOF
 }
 
-# Fill in remote_dir fields
-parse_dir() {
 
-    local dir=$1
+# read the options
+TEMP=`getopt -o hVp: --long help,version,port: -n $NTT_CMD_NAME -- "$@"`
 
-    local result=$(get_me "@" $dir)
-    remote_dir[user]=${result:-$USER}
-    dir=$(strip_till "@" $dir)
+eval set -- "$TEMP"
 
-    local result=$(get_me ":" $dir)
-    if [ -z $result ]
-    then
-        echo "Host not provided."
-        display_usage
-        exit 1
-    fi
-    remote_dir[host]=$result
-    dir=$(strip_till ":" $dir)
+# extract options and their arguments into variables.
 
-    dir=${dir%/} # Get rid of last slash
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -p|--port) case "$2" in
+            "") shift 2 ;;
+            *) port=$2 ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
 
-    remote_dir[dir]=$dir
-}
+ensure_args 2
+
+while read -r line || [[ -n "$line" ]]; do
+    eval $line
+done < <(../bin/parse-scheme $1 | \
+         hash_load "src_uri")
 
 
-# Show remote_dir values.
-show_dir() {
-    echo "User: ${remote_dir[user]}"
-    echo "Host: ${remote_dir[host]}"
-    echo "Dir : ${remote_dir[dir]} "
-}
+while read -r line || [[ -n "$line" ]]; do
+    eval $line
+done < <(../bin/parse-scheme $2 | \
+         hash_load "target_uri")
 
-my_ip () {
-    ip -o route get ${remote_dir[host]} | \
-    sed -n 's/.* src//p' - | \
-    sed -n  's/\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}/\nip&\n/gp' - | \
-    grep ip | sed 's/ip//'| sort | uniq
-}
-
-# Check number of params
-if [ $# -le 1 ]
-then
-    display_usage
-    exit 1
-fi
-
-# Look for help option
-last_param="${@:-1}"
-
-if [[ ( $last_param == "--help") || ($last_param == "-h") ]]
-then
-    display_usage
-    exit 0
-fi
-
-# main
+#<- Work in progress Till here
+#
 # local
 local_dir=${1%/}
 last_dir=${local_dir##*/}
@@ -92,7 +103,7 @@ command=$command$init_task$S$b$s$local_command
 command+=$s$S
 
 # remote
-parse_dir $2 # Parse remote schema
+parse_dir $2 # Parse remote scheme
 my_ip=$(my_IP)
 remote_command=${remote_command//REMOTE_DIR/${remote_dir[dir]}}
 remote_command=${remote_command//REMOTE_IP/$my_ip}

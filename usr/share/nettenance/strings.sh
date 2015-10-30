@@ -1,6 +1,4 @@
-#!/bin/bash
 # arguments.sh
-
 
 # Concatenates arguments using a specific separator (first argument)
 simple_join() {

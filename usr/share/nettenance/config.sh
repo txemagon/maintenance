@@ -1,3 +1,7 @@
+# config.sh
+
+# Functions to handle user/system wide config files.
+
 look_for () {
 	local target_file=$1
 	local dir_loc=NTT_LOC_$2
@@ -66,6 +70,7 @@ find_dir () {
 	    echo "Error. $target_file dir not found." >&2
 	fi
 }
+
 check_dir () {
 
     local target=$1

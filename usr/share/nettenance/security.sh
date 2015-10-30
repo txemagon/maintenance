@@ -1,3 +1,6 @@
+# security.sh
+
+# Accepts a file with only key-value pairs.
 include_sanitized () {
 	local configfile=$1
 	local configfile_secured='/tmp/sanitized.cfg'

@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+
+. ../share/nettenance/general.sh
+
+declare -A url
+
+# Load return value here since associatives
+# arrays cannot (yet) be exported.
+while read -r line || [[ -n "$line" ]]; do
+	eval $line
+done < <(../bin/parse-scheme luis@192.168.1.16/var/l.txt | \
+	     hash_load "url")
+
+# yei! Loaded!
+echo "${!url[@]}"
+echo "${url[@]}"
