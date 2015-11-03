@@ -51,7 +51,7 @@ parse-scp-scheme() {
     # extract the host
     hostport=`echo $url | sed -e s,$userpass@,,g | cut -d/ -f1`
     port=`echo $hostport | grep : | cut -d: -f2`
-    if [ -n "$port" ]; then
+    if [ -n "$port" ] || [[ "$hostport" =~ :  ]]; then
         host=`echo $hostport | grep : | cut -d: -f1`
     else
         host=$hostport
