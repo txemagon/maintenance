@@ -16,7 +16,7 @@ b="bash -c "
 
 port=8888
 
-local_command="pushd LOCAL_DIR; cd ..;pwd=\`pwd\`; tar -c OPTION0 | pv --size \`du -s $pwd | cut -f1\` | pigz -5 | nc -l 8888; echo 'Back to: '; popd"
+local_command="pushd LOCAL_DIR; cd ..;pwd=\`pwd\`; tar -c COMPRESSEDDIR | pv --size \`du -s $pwd | cut -f1\` | pigz -5 | nc -l 8888; echo 'Back to: '; popd"
 remote_command="mkdir -p REMOTE_DIR; cd REMOTE_DIR; nc REMOTE_IP 8888 | pigz -d | tar xvf -"
 
 declare -A src_uri
@@ -95,7 +95,7 @@ local_dir=${src_uri[path]%/}
 last_dir=${local_dir##*/}
 base_dir=${local_dir:0:`expr ${#local_dir}-${#last_dir}-1`}
 
-local_command=${local_command[0]//OPTION0/$last_dir}
+local_command=${local_command[0]//COMPRESSEDDIR/$last_dir}
 local_command=${local_command//LOCAL_DIR/$local_dir}
 command=$command$init_task$S$b$s$local_command
 #command+="; exec bash"
