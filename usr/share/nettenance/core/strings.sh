@@ -1,7 +1,7 @@
 # arguments.sh
 
 # Concatenates arguments using a specific separator (first argument)
-simple_join() {
+concatenate() {
     local IFS="$1"
     shift
     echo "$*"
