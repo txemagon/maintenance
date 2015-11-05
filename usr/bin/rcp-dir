@@ -34,7 +34,7 @@ USAGE:
 
     [<protocol>://]<user>:<password>@host:port/path/
 
-    Protocol is never used since setup connection is made via ssh
+    port within scheme is used for the ssh connection.
 
 OPTIONS:
     -p, --port:
@@ -80,19 +80,18 @@ ensure_args 2
 
 while read -r line || [[ -n "$line" ]]; do
     eval $line
-done < <(../bin/parse-scheme $1 | \
+done < <(parse-scheme $1 | \
          hash_load "src_uri")
 
 
 while read -r line || [[ -n "$line" ]]; do
     eval $line
-done < <(../bin/parse-scheme $2 | \
+done < <(parse-scheme $2 | \
          hash_load "target_uri")
 
-#<- Work in progress Till here
-#
+
 # local
-local_dir=${1%/}
+local_dir=${src_uri[path]%/}
 last_dir=${local_dir##*/}
 base_dir=${local_dir:0:`expr ${#local_dir}-${#last_dir}-1`}
 
@@ -103,8 +102,7 @@ command=$command$init_task$S$b$s$local_command
 command+=$s$S
 
 # remote
-parse_dir $2 # Parse remote scheme
-my_ip=$(my_IP)
+my_ip=$(my_ip for ${target_uri[host]})
 remote_command=${remote_command//REMOTE_DIR/${remote_dir[dir]}}
 remote_command=${remote_command//REMOTE_IP/$my_ip}
 
