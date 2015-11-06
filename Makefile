@@ -8,6 +8,7 @@ install-test:
 	ln -sf `pwd`/usr/bin/remote-dop /usr/bin/remote-dop
 	ln -sf `pwd`/usr/bin/remote-install /usr/bin/remote-install
 	ln -sf `pwd`/usr/bin/remote-installp /usr/bin/remote-installp
+	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/rcp-dir
 	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all
 	ln -sf `pwd`/usr/sbin/copy-credentials /usr/sbin/copy-credentials
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
@@ -25,6 +26,7 @@ uninstall-test:
 	rm /usr/bin/remote-dop
 	rm /usr/bin/remote-install
 	rm /usr/bin/remote-installp
+	rm /usr/bin/rcp-dir
 	rm /usr/sbin/push-all
 	rm /usr/sbin/copy-credentials
 	rm /etc/bash_completion.d/nettenance

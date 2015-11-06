@@ -1,6 +1,26 @@
 # scheme.sh
 
 # Parses an URL.
+#
+# It's made with uri schema on mind, but thinking
+# in ssh and scp too.
+#
+# Examples:
+#
+#
+# txema:pass@192.168.1.2:80var2/www    <= A relative path of var2/www
+# txema:pass@192.168.1.2:80/var2/www   <= Absolute path /var2/www
+# txema:pass@192.168.1.2/var2/www
+# txema:pass@192.168.1.2:~/var2/www    <= Relative paths enforces you to use port notation
+#                                         (empty port here)
+# Sample OUTPUT:
+#
+#  proto:
+#  user: txema
+#  pass: pass
+#  host: 192.168.1.2
+#  port: 80
+#  path: ~/var2/www
 
 parse-scheme() {
     local input=$1
@@ -27,8 +47,15 @@ parse-scheme() {
     else
         host=$hostport
     fi
+    # as long as localhost:~/pepe is a valid url, since used in scp
+    # we stay that we are specifying (:) a missing port.
+    # And also a relative url. Thus, we can end up with
+    # localhost:89~/pepe. So we gotta rip ~ from 89.
+    relative_path=$( echo "$port" | sed 's/^[0-9]\+//' )
+    port=$( echo "${port/$relative_path}" )
+    # relative_path=${relative_path:+$relative_path/}
     # extract the path (if any)
-    path="$(echo $url | grep / | cut -d/ -f2-)"
+    path="$(echo -n $relative_path/; echo $url | grep / | cut -d/ -f2-)"
 
     echo "url: $url"
     echo "  proto: $proto"

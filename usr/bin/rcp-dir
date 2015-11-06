@@ -76,7 +76,7 @@ while true ; do
     esac
 done
 
-ensure_args 2
+ensure_args 2 $#
 
 while read -r line || [[ -n "$line" ]]; do
     eval $line
@@ -102,15 +102,17 @@ command=$command$init_task$S$b$s$local_command
 command+=$s$S
 
 # remote
-my_ip=$(my_ip for ${target_uri[host]})
+my_ip=$(my_ip_for ${target_uri[host]})
 remote_command=${remote_command//REMOTE_DIR/${remote_dir[dir]}}
 remote_command=${remote_command//REMOTE_IP/$my_ip}
 
 command+=$init_task$S
-command+="ssh -t ${remote_dir[user]}@${remote_dir[host]} "
+scheme=$( ssh_scheme "$(declare -p target_uri)")
+command+="ssh -t $scheme"
+echo "!!!!!!!!!!!!!!!!!!!! $command"
 command+=$s$remote_command
 command+="; exec bash"$s$S
 
 # Run everything
 echo "Copying ${local_dir}: `du -sh $local_dir | cut -f1`"
-eval $command
+echo eval $command
