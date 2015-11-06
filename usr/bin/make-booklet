@@ -1,0 +1,4 @@
+#!/bin/bash
+# make-booklet
+
+pdf2ps myfile.pdf - | psbook | psnup -s1 -2 | ps2pdf - myfile_booklet.pdf
