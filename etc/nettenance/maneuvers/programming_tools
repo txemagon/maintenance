@@ -1,3 +1,6 @@
+#/bin/bash
+# programming_tools
+
 #!/bin/bash
 # programming_tools
 
@@ -9,5 +12,4 @@
 
 # ./remote_dop maneuvers/editor
 
-apt-get install vim build-essential g++ libncurses5-dev -y
-apt-get install libgnome2-bin -y
+apt-get install vim build-essential g++ libncurses5-dev libgnome2-bin figlet toilet -y
