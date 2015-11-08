@@ -30,15 +30,26 @@ scp_scheme () {
 
 
 ssh_command () {
+	declare -a options
+	while [[ ! "$1" =~ "declare" ]]; do
+		options+=$1
+		shift
+	done
 	local uri=$(ssh_scheme "$*")
-	[[ -n "$uri" ]] && echo ssh "$uri"
+	[[ -n "$uri" ]] && echo ssh "$(join_me " " ${options[@]}) $uri"
 
 }
 
 
 scp_command () {
+	declare -a options
+	while [[ ! "$1" =~ "declare" ]]; do
+		options+=$1
+		shift
+	done
+
 	local uri=$(scp_scheme "$*")
-	[[ -n "$uri" ]] && echo scp "$uri"
+	[[ -n "$uri" ]] && echo scp "$(join_me " "  ${options[@]}) $uri"
 
 
 }

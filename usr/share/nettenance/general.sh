@@ -8,6 +8,6 @@ NTT_SHARED_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . $NTT_SHARED_DIR/arguments.sh
 
 # Libraries
-. $NTT_SHARED_DIR/networking/general.sh
 . $NTT_SHARED_DIR/core/general.sh
+. $NTT_SHARED_DIR/networking/general.sh
 . $NTT_SHARED_DIR/filesystem/general.sh

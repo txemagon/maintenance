@@ -1,7 +1,7 @@
 # arguments.sh
 
 # Concatenates arguments using a specific separator (first argument)
-concatenate() {
+join_me() {
     local IFS="$1"
     shift
     echo "$*"
@@ -9,7 +9,7 @@ concatenate() {
 
 
 # Concatenates arguments using a specific separator (first argument)
-join() {
+concatenate() {
     local sep=$1
     local arguments=$2
     for i in "${arguments[@]}"; do
