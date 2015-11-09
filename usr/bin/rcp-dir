@@ -64,14 +64,6 @@ done
 
 ensure_args 2 $#
 
-command="gnome-terminal"
-init_task=" --tab -e "
-S="\""
-s="'"
-b="bash -c "
-
-port=8888
-
 declare -A src_uri
 declare -A target_uri
 
@@ -87,18 +79,24 @@ while read -r line || [[ -n "$line" ]]; do
 done < <(parse-scheme $2 | \
          hash_load "target_uri")
 
-echo $(my_ip_for ${target_uri[host]})
+
+## Main Program
+
 my_ip=$(my_ip_for ${target_uri[host]})
-echo $my_ip
-echo -e "$(load_script "$(look_for setup_rcp-dir_src.sh MNVR)" "${src_uri[path]}")" > sourcehost_script
-echo -e "$(load_script "$(look_for setup_rcp_target.sh MNVR)"  "${target_uri[path]}" $my_ip)" > targethost_script
 
-src_cmd="$( ssh_command -t "$(declare -p src_uri )" )   ' bash -s < sourcehost_script '"
-tar_cmd="$( ssh_command -t "$(declare -p target_uri )") ' bash -s < targethost_script '"
+echo -e "$(load_script "$(look_for setup_rcp-dir_src.sh MNVR)" "${src_uri[path]}" $my_ip)" > .sourcehost_script
+echo -e "$(load_script "$(look_for setup_rcp_target.sh MNVR)"  "${target_uri[path]}")" > .targethost_script
 
-gnome-terminal --tab -e "$src_cmd"  --tab -e "$tar_cmd"
+echo "$( ssh_command -t "$(declare -p src_uri )" )   \"\$(< .sourcehost_script)\"" > .srccmd_tab
+echo "$( ssh_command -t "$(declare -p target_uri )") \"\$(< .targethost_script)\"" > .target_tab
 
-#rm sourcehost_script
-#rm targethost_script
+gnome-terminal --tab -e "bash .srccmd_tab"  --tab -e "bash .target_tab"
+
+
+# Garbage will remain.
+#rm .srccmd_tab
+#rm .target_tab
+#rm .sourcehost_script
+#rm .targethost_script
 
 

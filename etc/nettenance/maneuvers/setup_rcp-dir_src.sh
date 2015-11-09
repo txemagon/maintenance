@@ -5,10 +5,11 @@
 
 
 # $1: Path to the directory to copy
-# $2: port for netcating.
+# $2: ip to connet
+# $3: port for netcating.
 
 # Default port
-PORT=$2
+PORT=$3
 PORT=${PORT:-8901}  # Avoid PORT=${2:-8901}, since
                     # load_script does not support it.
 
@@ -21,11 +22,11 @@ cd ..
 BASEDIR=$(pwd) # Base de directory.
             # The place we are going to commpress from.
 echo "$BASEDIR entered."
-PATH=$1
-TARGETDIR="${PATH##$BASEDIR/}"
+HPATH=$1
+TARGETDIR="${HPATH##$BASEDIR/}"
 
-echo "COnnection started and compressing."
-tar -c $TARGETDIR | pv --size $( du -sb $BASEDIR | cut -f1 ) | pigz -5 | nc -l $PORT
+echo "COnnection started. Compressing and transferring $(du -sh $TARGETDIR | cut -f1 )."
+tar -c $TARGETDIR | pv | pigz -5 | nc $2 $PORT
 echo 'Back to: '
 popd
 
