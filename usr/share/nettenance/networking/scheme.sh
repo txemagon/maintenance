@@ -13,6 +13,11 @@
 # txema:pass@192.168.1.2/var2/www
 # txema:pass@192.168.1.2:~/var2/www    <= Relative paths enforces you to use port notation
 #                                         (empty port here)
+# localhost                            <= Recognized DNS. So, host: localhost. Path: /
+# var                                  <= Unrecognized DNS. So, host: empty Path: var/
+# :localhost                           <= Port notation : with empty port. Path: localhost/
+#
+#
 # Sample OUTPUT:
 #
 #  proto:
@@ -47,6 +52,9 @@ parse-scheme() {
     else
         host=$hostport
     fi
+
+    # Relative PATH-PORt problem
+    #
     # as long as localhost:~/pepe is a valid url, since used in scp
     # we stay that we are specifying (:) a missing port.
     # And also a relative url. Thus, we can end up with
@@ -56,6 +64,17 @@ parse-scheme() {
     # relative_path=${relative_path:+$relative_path/}
     # extract the path (if any)
     path="$(echo -n $relative_path/; echo $url | grep / | cut -d/ -f2-)"
+
+
+    # Relative PATH-HOST problem.
+    #
+    # Goal: Discriminate from: localhost or tmp
+    # When no port or protocol is given is hard to discriminate
+    # between a host name and a relative path
+    if [[ -z "$proto" ]] && [[ -n "$host" ]] && ! is_an_ip "$host" && ! host_exists "$host" ; then
+        path="$host$path"
+        host=""
+    fi
 
     echo "url: $url"
     echo "  proto: $proto"

@@ -87,32 +87,18 @@ while read -r line || [[ -n "$line" ]]; do
 done < <(parse-scheme $2 | \
          hash_load "target_uri")
 
+echo $(my_ip_for ${target_uri[host]})
+my_ip=$(my_ip_for ${target_uri[host]})
+echo $my_ip
+echo -e "$(load_script "$(look_for setup_rcp-dir_src.sh MNVR)" "${src_uri[path]}")" > sourcehost_script
+echo -e "$(load_script "$(look_for setup_rcp_target.sh MNVR)"  "${target_uri[path]}" $my_ip)" > targethost_script
 
-# local
-#   local_dir=${src_uri[path]%/}
-#   last_dir=${local_dir##*/}
-#   base_dir=${local_dir:0:`expr ${#local_dir}-${#last_dir}-1`}
-#
-#   local_command=${local_command[0]//COMPRESSEDDIR/$last_dir}
-#   local_command=${local_command//LOCAL_DIR/$local_dir}
-#   command=$command$init_task$S$b$s$local_command
-#   #command+="; exec bash"
-#   command+=$s$S
-#   echo "!"
-#
-#   # remote
-#   my_ip=$(my_ip_for ${target_uri[host]})
-#   remote_command=${remote_command//REMOTE_DIR/${remote_dir[dir]}}
-#   remote_command=${remote_command//REMOTE_IP/$my_ip}
-#
-#   command+=$init_task$S
-#   scheme=$( scp_scheme "$(declare -p target_uri)")
-#   command+="ssh -t $scheme"
-#   echo "!!!! $command"
-#
-#   command+=$s$remote_command
-#   command+="; exec bash"$s$S
+src_cmd="$( ssh_command -t "$(declare -p src_uri )" )   ' bash -s < sourcehost_script '"
+tar_cmd="$( ssh_command -t "$(declare -p target_uri )") ' bash -s < targethost_script '"
 
-# Run everything
-echo "Copying ${local_dir}: `du -sh $local_dir | cut -f1`"
-echo eval $command
+gnome-terminal --tab -e "$src_cmd"  --tab -e "$tar_cmd"
+
+#rm sourcehost_script
+#rm targethost_script
+
+

@@ -1,8 +1,8 @@
 #!/bin/bash
 # setup_rcp_target.sh
 
-# $1: remote dir
-# $2: ip of the source machine
+# ~/pepe: remote dir
+# 192.168.1.39: ip of the source machine
 # $3: netcating port
 
 # Default port
@@ -14,10 +14,11 @@ echo "TARGET MACHINE"
 echo "=============="
 echo
 
-echo "Creating dir $1."
-mkdir -p $1;
-cd $1;
+echo "Creating dir ~/pepe."
+mkdir -p ~/pepe;
+cd ~/pepe;
 
 echo "Connection started. Decompressing."
-nc $2 $PORT | pigz -d | tar xvf -
+nc 192.168.1.39 $PORT | pigz -d | tar xvf -
+exec bash
 
