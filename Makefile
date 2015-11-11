@@ -2,7 +2,19 @@ SHELL := /bin/bash
 
 .PHONY: install-test post-install uninstall-test customize decustomize
 
-install-test:
+customize:
+	mkdir ~/.nettenance
+	mkdir ~/.nettenance/hosts
+	mkdir ~/.nettenance/maneuvers
+	mkdir ~/.nettenance/repository
+
+decustomize:
+	rmdir ~/.nettenance/hosts
+	rmdir ~/.nettenance/maneuvers
+	rmdir ~/.nettenance/repository
+	rmdir ~/.nettenance
+
+install:
 	ln -sf `pwd`/usr/bin/do-in /usr/bin/do-in
 	ln -sf `pwd`/usr/bin/remote-do /usr/bin/remote-do
 	ln -sf `pwd`/usr/bin/remote-dop /usr/bin/remote-dop
@@ -20,7 +32,7 @@ install-test:
 	cp -R srv/nettenance/repository/* /srv/nettenance/repository
 
 
-uninstall-test:
+uninstall:
 	rm /usr/bin/do-in
 	rm /usr/bin/remote-do
 	rm /usr/bin/remote-dop
@@ -33,14 +45,3 @@ uninstall-test:
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
 
-customize:
-	mkdir ~/.nettenance
-	mkdir ~/.nettenance/hosts
-	mkdir ~/.nettenance/maneuvers
-	mkdir ~/.nettenance/repository
-
-decustomize:
-	rmdir ~/.nettenance/hosts
-	rmdir ~/.nettenance/maneuvers
-	rmdir ~/.nettenance/repository
-	rmdir ~/.nettenance

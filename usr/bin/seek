@@ -1,0 +1,82 @@
+#!/bin/bash
+# seek
+
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+hostfile=userhost.lst
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Find the ip where the user is logged in.
+
+USAGE:
+    $NTT_CMD_NAME [<options>] [<maneuver file parameters>]
+
+
+OPTIONS:
+    -H, --hosts:
+          -H {<user_host_file>=userhost.lst}
+          User host file is a list of host names or ip's specifying target machines.
+          When any file is specified, 'userhost.lst' is assumed to exist either in:
+
+               - $NTT_LOC_MNVR
+               - $NTT_SYS_MNVR
+
+          respectively. It is a good idea to keep separate lists of IPs under ~/.nettenance/hosts
+          and link ~/.nettenance/userhost.lst to point to the desired environment.
+
+    -a, --all
+          Find all IPs where user is logged in. Otherwise it will stop after first match.
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLE: $NTT_CMD_NAME user_john
+
+EOF
+}
+
+
+
+# read the options
+TEMP=`getopt -o hVH:a --long help,version,hosts,all: -n $NTT_CMD_NAME -- "$@"`
+
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+
+declare -i all=0
+
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -a|--all) all=1 ; shift ;;
+        -H|--hosts) case "$2" in
+            "") shift 2 ;;
+            *) hostfile=$2 ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+hostfile=$(look_for $hostfile HOST)
+ensure_args 1 $#
+check_existence_of $hostfile
+
+for ip in `cat $hostfile`; do
+    users="$(ssh root@$ip "who" 2>/dev/null )"
+    users="$( echo "$users" | grep $1 )"
+    if [[ -n "$users" ]]; then
+        echo "$ip"
+        [ "$all" = 0 ] && break;
+    fi
+done
+
