@@ -25,6 +25,7 @@ echo "$BASEDIR entered."
 HPATH=$1
 TARGETDIR="${HPATH##$BASEDIR/}"
 
+read -r -p "Press any key when target machine is ready to start. "
 echo "COnnection started. Compressing and transferring $(du -sh $TARGETDIR | cut -f1 )."
 tar -c $TARGETDIR | pv | pigz -5 | nc $2 $PORT
 echo 'Back to: '

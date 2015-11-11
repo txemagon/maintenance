@@ -51,5 +51,4 @@ scp_command () {
 	local uri=$(scp_scheme "$*")
 	[[ -n "$uri" ]] && echo scp "$(join_me " "  ${options[@]}) $uri"
 
-
 }

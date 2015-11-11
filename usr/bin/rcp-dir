@@ -13,6 +13,11 @@ display_usage () {
 
     $NTT_CMD_NAME v$VERSION  -  Copies one dir from one host to another.
 
+    This command opens an ssh connection to both machines -if needed-
+    and establishes a netcat connection between both of them. Then,
+    five parallel threads start compressing data and piping through
+    netcat port.
+
 USAGE:
     $NTT_CMD_NAME [<options>] <src_uri> <target_uri>
 
@@ -33,29 +38,52 @@ OPTIONS:
     -V, --version
           Displays program version.
 
+    -c, --compressed
+          Leave the directory compressed on target machine.
+
+   -t, --threads  Default to 5.
+         Specify number of compressing threads.
+
 EXAMPLES:
 
     $NTT_CMD_NAME root@172.17.1.20/var/www/mempleo.es root@172.17.1.200/var/www
-    $NTT_CMD_NAME ./src root:my_pass@172.17.1.200/var/www
+    $NTT_CMD_NAME ./src root@172.17.1.200/var/www
+    $NTT_CMD_NAME ./src user@172.17.1.200tmp/www  # tmp/www will be inside user home dir.
+    $NTT_CMD_NAME ./src user@172.17.1.200:tmp/www # Same as previous.
+    $NTT_CMD_NAME ./src user:pass@172.17.1.200:tmp/www # Valid url, but pass not used.
 
 EOF
 }
 
 
 # read the options
-TEMP=`getopt -o hVp: --long help,version,port: -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVcp:t: --long help,version,compressed,threads:,port: -n $NTT_CMD_NAME -- "$@"`
 
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
-
+declare -i compressed=0
+declare -i threads=0
 while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
         -V|--version) display_version; exit 0;;
+        -c|--compressed) compressed=1; shift;;
         -p|--port) case "$2" in
             "") shift 2 ;;
             *) port=$2 ; shift 2 ;;
+        esac ;;
+        -t|--threads) case "$2" in
+            "") shift 2 ;;
+            *) threads=$2
+               shift 2
+               if ! [[ "$threads" =~ ^[0-9]+$  ]]; then
+                  echo "Invalid thread number: $threads" 1>&2
+                  echo 1>&2
+                  display_usage 1>&2
+                  exit 1
+               fi
+               ;;
         esac ;;
         --) shift ; break ;;
         *) echo "Internal error!" >&2; exit 1 ;;
@@ -80,23 +108,81 @@ done < <(parse-scheme $2 | \
          hash_load "target_uri")
 
 
+# $1: remote file
+# $2: operation path
+# $3: target netcat ip
+prepare_script(){
+    echo -e "$(load_script "$(look_for $1 MNVR)" "$2" $3)"
+}
+
+# $1: host uri
+# $2: remote script file name
+terminal_command(){
+   local connect_cmd="$( ssh_command -t "$1" )"
+
+   if [[ -z "$connect_cmd" ]]; then
+       echo ". $2"
+   else
+       echo "$connect_cmd \"\$(< $2)\""
+   fi
+}
+
 ## Main Program
 
-my_ip=$(my_ip_for ${target_uri[host]})
+nc_target_ip=$(my_ip_for ${target_uri[host]})
+nc_target_ip=${nc_target_ip:-localhost}
 
-echo -e "$(load_script "$(look_for setup_rcp-dir_src.sh MNVR)" "${src_uri[path]}" $my_ip)" > .sourcehost_script
-echo -e "$(load_script "$(look_for setup_rcp_target.sh MNVR)"  "${target_uri[path]}")" > .targethost_script
+prepare_script setup_rcp-dir_src.sh "${src_uri[path]}" $nc_target_ip > .sourcehost_script
+prepare_script setup_rcp_target.sh  "${target_uri[path]}"     > .targethost_script
 
-echo "$( ssh_command -t "$(declare -p src_uri )" )   \"\$(< .sourcehost_script)\"" > .srccmd_tab
-echo "$( ssh_command -t "$(declare -p target_uri )") \"\$(< .targethost_script)\"" > .target_tab
+if [ $compressed -eq 1 ]; then
+   sed -i  's/echo -e "$( ls /echo -e "$( ls -lh $1/' .targethost_script
+   sed -i 's/^nc -l $PORT.*/nc -l $PORT > '"$(basename ${src_uri[path]}).tar.gz/" .targethost_script
+fi
 
+if [ $threads -ge 1 ]; then
+   sed -i  's/pigz -5/pigz -'"$threads/" .sourcehost_script
+fi
+
+
+terminal_command "$( declare -p src_uri )"    .sourcehost_script > .srccmd_tab
+terminal_command "$( declare -p target_uri )" .targethost_script > .target_tab
+
+echo "${src_uri[host]}:${src_uri[path]} => ${target_uri[host]}:${target_uri[path]}"
+echo "Copy started."
+
+opts="$(who | tr -s ' ' | cut -d' ' -f2)"
 gnome-terminal --tab -e "bash .srccmd_tab"  --tab -e "bash .target_tab"
+sleep 3
+npts="$(who | tr -s ' ' | cut -d' ' -f2)"
+tabs="$( echo -e "$npts\n$opts" | sort | uniq -u )"
 
 
-# Garbage will remain.
-#rm .srccmd_tab
-#rm .target_tab
-#rm .sourcehost_script
-#rm .targethost_script
+# Wait until copy finishes to delete script files.
+# Cross fingers due to wonderful gnome-terminal forking facilities
+# Hurray for sigchld
 
+echo "Attend the new window with two tabs to start transfer."
+echo "$NTT_CMD_NAME will run on the background."
+echo "Proceed with your work. You'll receive a message"
+echo "on this terminal when copy is over."
+tabs_open="$tabs"
+{
+    while [[ -n "$tabs_open" ]]; do
+       tabs_open=""
+       current_tabs="$(who | tr -s ' ' | cut -d' ' -f2)"
+       for tab in $tabs; do
+          tabs_open+="$(echo -e "$current_tabs" | grep "$tab")"
+          sleep 1
+       done
+    done
+
+    rm .srccmd_tab
+    rm .target_tab
+    rm .sourcehost_script
+    rm .targethost_script
+
+    echo "$NTT_CMD_NAME - Copy is over."
+
+} &
 

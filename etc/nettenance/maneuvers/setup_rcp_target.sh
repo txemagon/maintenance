@@ -18,7 +18,7 @@ if [[ -e "$1" ]]; then
     echo
     echo -e "$( ls $1 )"
     echo
-    read -r -p "Continue (y/N): "
+    read -r -p "Continue (Y/n): "
     if [[ $REPLY =~ ^[Nn]$ ]]; then
         echo "Nothing was written."
         exit 1
