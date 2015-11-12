@@ -1,0 +1,103 @@
+#!/bin/bash
+# list-macs
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Note: Point with userhost.lst (symbolic link) to a file
+# containing the hosts
+
+## Config Default Values
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+user="root"
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  - List active hosts' IP and MAC contained in
+                               the userhost file.
+
+USAGE:
+    $NTT_CMD_NAME [<options>]
+
+OPTIONS:
+    -H, --hosts:
+          -H {<user_host_file>=userhost.lst}
+          User host file is a list of host names or ip's specifying target machines.
+          When any file is specified, 'userhost.lst' is assumed to exist either in:
+
+               - $NTT_LOC_MNVR
+               - $NTT_SYS_MNVR
+
+          respectively. It is a good idea to keep separate lists of IPs under ~/.nettenance/hosts
+          and link ~/.nettenance/userhost.lst to point to the desired environment.
+
+    -u, --user
+          -u {<user>=root}
+          Remote user where identity is to be copied. The user you automatically you want to ssh to.
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLE: $NTT_CMD_NAME
+         List all hosts listed in userhost.lst active. IP and MAC are both displayed.
+         $NTT_LOC_CONF/userhost.lst or userhost.lst under $NTT_SYS_CONF/userhost.lst when
+         former not found.
+
+EOF
+}
+
+hostfile=userhost.lst
+
+
+# read the options
+TEMP=`getopt -o hVH:u: --long help,version,hosts:,user: -n $NTT_CMD_NAME -- "$@"`
+
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -H|--hosts) case "$2" in
+            "") shift 2 ;;
+            *) hostfile=$2 ; shift 2 ;;
+        esac ;;
+        -u|--user) case "$2" in
+            "") shift 2 ;;
+            *) user=$2 ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+hostfile=$(look_for $hostfile HOST)
+check_existence_of $hostfile
+
+
+# Contact all possible files to cache MAC
+for ip in `cat $hostfile`; do
+    ping -nc1 -w1 $ip &> /dev/null
+done
+
+
+# Print lines containing a MAC
+while read -r line; do
+    mac="$(echo $line | cut -d' ' -f3 )"
+    ip="$(echo $line | cut -d' ' -f1 )"
+    if [[ "$mac" =~ :[0-9]{2}  ]]; then
+        if grep --quiet "$ip" $hostfile ; then
+            echo -n "$ip"
+            echo -e "\t$mac"
+        fi
+    fi
+done < <( arp -n | tr -s ' ' ) | sort

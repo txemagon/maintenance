@@ -21,8 +21,10 @@ install:
 	ln -sf `pwd`/usr/bin/remote-install /usr/bin/remote-install
 	ln -sf `pwd`/usr/bin/remote-installp /usr/bin/remote-installp
 	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/rcp-dir
+	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/seek
 	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all
 	ln -sf `pwd`/usr/sbin/copy-credentials /usr/sbin/copy-credentials
+	ln -sf `pwd`/usr/sbin/list-macs /usr/sbin/list-macs
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance
@@ -39,8 +41,10 @@ uninstall:
 	rm /usr/bin/remote-install
 	rm /usr/bin/remote-installp
 	rm /usr/bin/rcp-dir
+	rm /usr/bin/seek
 	rm /usr/sbin/push-all
 	rm /usr/sbin/copy-credentials
+	rm /usr/sbin/list-macs
 	rm /etc/bash_completion.d/nettenance
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
