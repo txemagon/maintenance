@@ -5,3 +5,4 @@ rsync
 getopt
 gnome-terminal
 ssh
+etherwake

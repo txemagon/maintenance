@@ -100,4 +100,4 @@ while read -r line; do
             echo -e "\t$mac"
         fi
     fi
-done < <( arp -n | tr -s ' ' ) | sort
+done < <( arp -n | tr -s ' ' ) | sort -n

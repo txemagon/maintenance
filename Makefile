@@ -25,6 +25,7 @@ install:
 	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all
 	ln -sf `pwd`/usr/sbin/copy-credentials /usr/sbin/copy-credentials
 	ln -sf `pwd`/usr/sbin/list-macs /usr/sbin/list-macs
+	ln -sf `pwd`/usr/sbin/awake /usr/sbin/awake
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance
@@ -45,6 +46,7 @@ uninstall:
 	rm /usr/sbin/push-all
 	rm /usr/sbin/copy-credentials
 	rm /usr/sbin/list-macs
+	rm /usr/sbin/awake
 	rm /etc/bash_completion.d/nettenance
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance

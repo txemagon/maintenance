@@ -1,0 +1,80 @@
+#!/bin/bash
+# awake
+
+# Oct, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Awakes all computer in the net.
+
+# Usage:   awake
+
+# Note: Point with userhost.lst (symbolic link) to a file
+# containing the hosts.
+
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Awakes all the computers pointed by the host file.
+
+USAGE:
+    $NTT_CMD_NAME [<options>]
+
+OPTIONS:
+    -m, --macs:
+          -m {<mac_host_file>=macs.lst}
+          Mac host file is a list of MACs specifying target machines.
+          When any file is specified, 'mac.lst' is assumed to exist either in:
+
+               - $NTT_LOC_MNVR
+               - $NTT_SYS_MNVR
+
+          respectively. It is a good idea to keep separate lists of MACs under ~/.nettenance/hosts
+          and link ~/.nettenance/macs.lst to point to the desired environment.
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLE: $NTT_CMD_NAME greet
+
+EOF
+}
+
+macfile=macs.lst
+
+
+# read the options
+TEMP=`getopt -o hVm: --long help,version,macs: -n $NTT_CMD_NAME -- "$@"`
+
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -m|--macss) case "$2" in
+            "") shift 2 ;;
+            *) macfile=$2 ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+macfile=$(look_for $macfile HOST)
+# ensure_args 0 $# # No arguments needed this time
+check_existence_of $macfile
+
+
+for mac in `cat $macfile`; do
+    etherwake $mac  &
+done
+
