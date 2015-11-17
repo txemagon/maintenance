@@ -12,4 +12,4 @@
 
 # ./remote_dop maneuvers/editor
 
-apt-get install vim build-essential g++ libncurses5-dev libgnome2-bin figlet toilet -y
+apt-get install vim build-essential g++ libncurses5-dev libreadline-dev libgnome2-bin figlet toilet -y
