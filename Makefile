@@ -26,6 +26,7 @@ install:
 	ln -sf `pwd`/usr/sbin/copy-credentials /usr/sbin/copy-credentials
 	ln -sf `pwd`/usr/sbin/list-macs /usr/sbin/list-macs
 	ln -sf `pwd`/usr/sbin/awake /usr/sbin/awake
+	ln -sf `pwd`/usr/sbin/host-scan /usr/sbin/host-scan
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance
@@ -33,7 +34,7 @@ install:
 	cp -R usr/share/nettenance/* /usr/share/nettenance
 	mkdir -p /srv/nettenance/repository
 	cp -R srv/nettenance/repository/* /srv/nettenance/repository
-
+	mkdir -p /var/nettenance
 
 uninstall:
 	rm /usr/bin/do-in
@@ -47,7 +48,8 @@ uninstall:
 	rm /usr/sbin/copy-credentials
 	rm /usr/sbin/list-macs
 	rm /usr/sbin/awake
+	rm /usr/sbin/host-scan
 	rm /etc/bash_completion.d/nettenance
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
-
+	rm -rf /var/nettenance

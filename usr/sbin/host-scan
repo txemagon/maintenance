@@ -1,0 +1,85 @@
+#!/bin/bash
+# host-scan
+
+# Execute as:
+# $ setsid host-scan
+
+# Little daemon to check net ips and mac addresses
+# whithin all userhost.lst files in the system.
+
+# Output written to /var/nettenance and
+# /var/log/syslog
+
+# Nov, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# todo: lock multiple instances
+# todo: look in multiple userhosts.lst
+
+## Config Default Values
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+NAME=$(basename $0 )
+
+close-fds() {
+    eval exec {0..255}\>\&-
+}
+
+reload_config() {
+   logger -t "$NAME" "Config Reload pid $BASHPID."
+}
+
+say_bye(){
+	rm "run/$NAME.pid$BASHPID"
+	logger -t "$NAME" "Shutdown pid $BASHPID."
+	exit 0
+}
+
+host-scan-main_loop () {
+	while [ 1 ]; do
+		list-macs > macs.txt
+        logger -t "$NAME" "List of macs generated."
+        # Enable signals while sleeping
+		sleep 60 &
+		wait
+	done
+
+}
+
+init () {
+	logger -t "$NAME" "Nettenance Host Scan starting."
+	trap 'reload_config' HUP
+	trap 'say_bye' TERM
+
+	# Ignored signals
+	# Child dead uncaught because of sleep
+	# trap ':' CHLD
+	# Terminal signals
+	trap ':' TTOU
+	trap ':' TTIN
+	trap ':' TSTP
+
+	umask 033
+	mkdir -p /var/nettenance/run &> /dev/null
+	cd /var/nettenance
+	echo 1 > "run/$NAME.pid$BASHPID"
+
+	# Close standard fd
+	close-fds
+
+    logger -t "$NAME" "Nettenance Host Scan started. pid $BASHPID"
+	# start daemon
+    host-scan-main_loop
+}
+
+# Execute a subshell as a background
+# fork of host-scan script.
+# Run init within that subshell
+ ( init ) &
+
+# Note:
+# As soon as host-scan ends, the
+# subshell whit no parent is inherited
+# by init. PPID=1
