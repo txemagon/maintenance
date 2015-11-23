@@ -13,8 +13,6 @@
 # Nov, 2015, txema.gonz@gmail.com
 # GNU GENERAL PUBLIC LICENSE, Version 2
 
-# todo: lock multiple instances
-# todo: look in multiple userhosts.lst
 
 ## Config Default Values
 VERSION=1.0
@@ -32,22 +30,44 @@ reload_config() {
 }
 
 say_bye(){
-	rm "run/$NAME.pid$BASHPID"
+	rm "/var/run/$NAME.pid"
 	logger -t "$NAME" "Shutdown pid $BASHPID."
 	exit 0
 }
 
+# Program start
+home_dirs () {
+   getent passwd | cut -d: -f6 | grep /home
+}
+
 host-scan-main_loop () {
 	while [ 1 ]; do
-		list-macs > macs.txt
-        logger -t "$NAME" "List of macs generated."
+		# Global files scan
+		for lst in /etc/nettenance/hosts/*; do
+		    local filename=global."${lst##*/}".macs
+		    list-macs -H "$lst"> "$filename"
+            logger -t "$NAME" "List of macs [$filename] generated."
+        done
+
+        # Per user host files scan
+		for home in $(home_dirs); do
+			if [[ -d "$home/.nettenance/hosts" ]]; then
+				for lst in "$home"/.nettenance/hosts/*; do
+					local filename="${home##*/}"."${lst##*/}".macs
+		            list-macs -H "$lst"> "$filename"
+                    logger -t "$NAME" "List of macs [$filename] generated."
+                done
+            fi
+		done
+
         # Enable signals while sleeping
-		sleep 60 &
+		sleep 300 &
 		wait
 	done
 
 }
 
+# Program end
 init () {
 	logger -t "$NAME" "Nettenance Host Scan starting."
 	trap 'reload_config' HUP
@@ -64,7 +84,8 @@ init () {
 	umask 033
 	mkdir -p /var/nettenance/run &> /dev/null
 	cd /var/nettenance
-	echo 1 > "run/$NAME.pid$BASHPID"
+	[[ -f "/var/run/$NAME.pid" ]] && echo "$NAME already in use." 1>&2 && exit 1
+	echo "$BASHPID" > "/var/run/$NAME.pid"
 
 	# Close standard fd
 	close-fds
@@ -77,9 +98,11 @@ init () {
 # Execute a subshell as a background
 # fork of host-scan script.
 # Run init within that subshell
- ( init ) &
 
 # Note:
 # As soon as host-scan ends, the
 # subshell whit no parent is inherited
 # by init. PPID=1
+
+# Uncomment the following line to run it as a daemon
+( init ) &

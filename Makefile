@@ -35,6 +35,7 @@ install:
 	mkdir -p /srv/nettenance/repository
 	cp -R srv/nettenance/repository/* /srv/nettenance/repository
 	mkdir -p /var/nettenance
+	cp etc/init.d/host-scan /etc/init.d/
 
 uninstall:
 	rm /usr/bin/do-in
@@ -53,3 +54,4 @@ uninstall:
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
 	rm -rf /var/nettenance
+	rm etc/init.d/host-scan

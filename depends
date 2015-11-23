@@ -6,3 +6,5 @@ getopt
 gnome-terminal
 ssh
 etherwake
+getent
+setsid
