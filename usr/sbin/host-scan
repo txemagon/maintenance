@@ -26,7 +26,9 @@ close-fds() {
 }
 
 reload_config() {
+   include_sanitized /etc/nettenance/host-scan.conf
    logger -t "$NAME" "Config Reload pid $BASHPID."
+   logger -t "$NAME" "RELOAD_TIME=$RELOAD_TIME"
 }
 
 say_bye(){
@@ -61,7 +63,7 @@ host-scan-main_loop () {
 		done
 
         # Enable signals while sleeping
-		sleep 300 &
+		sleep "$RELOAD_TIME" &
 		wait
 	done
 
@@ -91,6 +93,7 @@ init () {
 	close-fds
 
     logger -t "$NAME" "Nettenance Host Scan started. pid $BASHPID"
+    reload_config
 	# start daemon
     host-scan-main_loop
 }
