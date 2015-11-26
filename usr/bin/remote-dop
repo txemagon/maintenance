@@ -90,7 +90,7 @@ check_existence_of $hostfile
 maneuver=$(look_for $1 MNVR)
 
 command=$terminal
-for ip in `cat $hostfile`; do
+for ip in $(list-hosts -H $hostfile); do
 	command+=$option$S
 	command+="ssh root@$ip 'bash -s' < $maneuver"
 	command+=$S

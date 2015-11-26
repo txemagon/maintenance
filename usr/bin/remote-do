@@ -84,7 +84,7 @@ check_existence_of $hostfile
 
 maneuver=$(look_for $1 MNVR)
 
-for ip in `cat $hostfile`; do
+for ip in $(list-hosts -H $hostfile); do
     toilet -f term -F border --gay $ip
     ssh root@$ip "bash -s" < $maneuver &
 done

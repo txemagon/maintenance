@@ -38,10 +38,6 @@ say_bye(){
 }
 
 # Program start
-home_dirs () {
-   getent passwd | cut -d: -f6 | grep /home
-}
-
 host-scan-main_loop () {
 	while [ 1 ]; do
 		# Global files scan
@@ -57,6 +53,7 @@ host-scan-main_loop () {
 				for lst in "$home"/.nettenance/hosts/*; do
 					local filename="${home##*/}"."${lst##*/}".macs
 		            list-macs -H "$lst"> "$filename"
+		            chmod +r "$filename"
                     logger -t "$NAME" "List of macs [$filename] generated."
                 done
             fi
@@ -84,7 +81,7 @@ init () {
 	trap ':' TSTP
 
 	umask 033
-	mkdir -p /var/nettenance/run &> /dev/null
+	mkdir -p /var/nettenance &> /dev/null
 	cd /var/nettenance
 	[[ -f "/var/run/$NAME.pid" ]] && echo "$NAME already in use." 1>&2 && exit 1
 	echo "$BASHPID" > "/var/run/$NAME.pid"

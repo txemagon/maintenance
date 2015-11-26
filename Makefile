@@ -22,6 +22,8 @@ install:
 	ln -sf `pwd`/usr/bin/remote-installp /usr/bin/remote-installp
 	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/rcp-dir
 	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/seek
+	ln -sf `pwd`/usr/bin/list-hosts /usr/bin/list-hosts
+	ln -sf `pwd`/usr/bin/make-booklet /usr/bin/make-booklet
 	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all
 	ln -sf `pwd`/usr/sbin/copy-credentials /usr/sbin/copy-credentials
 	ln -sf `pwd`/usr/sbin/list-macs /usr/sbin/list-macs
@@ -35,6 +37,7 @@ install:
 	mkdir -p /srv/nettenance/repository
 	cp -R srv/nettenance/repository/* /srv/nettenance/repository
 	mkdir -p /var/nettenance
+	chmod +x /var/nettenance
 	cp etc/init.d/host-scan /etc/init.d/
 
 uninstall:
@@ -45,6 +48,8 @@ uninstall:
 	rm /usr/bin/remote-installp
 	rm /usr/bin/rcp-dir
 	rm /usr/bin/seek
+	rm /usr/bin/list-hosts
+	rm /usr/bin/make-booklet
 	rm /usr/sbin/push-all
 	rm /usr/sbin/copy-credentials
 	rm /usr/sbin/list-macs

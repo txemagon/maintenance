@@ -55,6 +55,8 @@ do_start()
 do_stop()
 {
 	kill $(cat "$PIDFILE")
+	# Despite not necessary, kill all running instances
+	pkill "$NAME"
 }
 
 #

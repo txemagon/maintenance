@@ -94,7 +94,7 @@ then
 fi
 
 echo "Starting..."
-for ip in `cat $hostfile`; do
+for ip in $(list-hosts -H $hostfile); do
    toilet -f term -F border --gay  "$ip"
    rsync -avz  $repository/ root@$ip:/
 done

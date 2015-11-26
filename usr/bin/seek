@@ -71,7 +71,7 @@ hostfile=$(look_for $hostfile HOST)
 ensure_args 1 $#
 check_existence_of $hostfile
 
-for ip in `cat $hostfile`; do
+for ip in $(list-hosts $hostfile); do
     users="$(ssh root@$ip "who" 2>/dev/null )"
     users="$( echo "$users" | grep $1 )"
     if [[ -n "$users" ]]; then
