@@ -91,7 +91,9 @@ init () {
 
     # Ensure structure
     mkdir -p /var/nettenance/scan &> /dev/null
+    chmod +x /var/nettenance/scan &> /dev/null
     mkdir -p /var/nettenance/known &> /dev/null
+    chmod +x /var/nettenance/known &> /dev/null
 
 	# Close standard fd
 	close-fds

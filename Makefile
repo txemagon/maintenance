@@ -38,6 +38,10 @@ install:
 	cp -R srv/nettenance/repository/* /srv/nettenance/repository
 	mkdir -p /var/nettenance
 	chmod +x /var/nettenance
+	mkdir -p /var/nettenance/scan
+	chmod +x /var/nettenance/scan
+	mkdir -p /var/nettenance/known
+	chmod +x /var/nettenance/known
 	cp etc/init.d/host-scan /etc/init.d/
 
 uninstall:

@@ -104,7 +104,7 @@ original=$(readlink -m $hostfile)
 original_path="$(dirname "$original")"
 original_file="$(basename "$original")"
 
-for whole_fn in /var/nettenance/*.macs; do
+for whole_fn in /var/nettenance/scan/*.macs; do
 	f="${whole_fn##*/}"
 	f="${f%.macs}"
 	user="${f%%.*}"
@@ -122,7 +122,10 @@ done
 # Test RELOAD_TIME
 include_sanitized /etc/nettenance/host-scan.conf
 
-aged=$(( $(date +%s) - $(date +%s -r "$final_file") ))
+aged=0
+if [[ -d "/var/nettenance/scan" ]] && [[ -x "/var/nettenance/scan" ]] && [[ -f "$final_file" ]]; then
+  aged=$(( $(date +%s) - $(date +%s -r "$final_file") ))
+fi
 
 if [ $cutting -ne 1 -o $RELOAD_TIME -gt $aged ]; then
 	hostfile="$final_file"
