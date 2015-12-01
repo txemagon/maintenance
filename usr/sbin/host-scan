@@ -19,6 +19,7 @@ VERSION=1.0
 
 . /usr/share/nettenance/general.sh
 
+
 NAME=$(basename $0 )
 
 close-fds() {
@@ -43,7 +44,7 @@ host-scan-main_loop () {
 		# Global files scan
 		for lst in /etc/nettenance/hosts/*; do
 		    local filename=global."${lst##*/}".macs
-		    list-macs -H "$lst"> "$filename"
+		    list-macs -H "$lst"> "scan/$filename"
             logger -t "$NAME" "List of macs [$filename] generated."
         done
 
@@ -52,7 +53,7 @@ host-scan-main_loop () {
 			if [[ -d "$home/.nettenance/hosts" ]]; then
 				for lst in "$home"/.nettenance/hosts/*; do
 					local filename="${home##*/}"."${lst##*/}".macs
-		            list-macs -H "$lst"> "$filename"
+		            list-macs -H "$lst"> "scan/$filename"
 		            chmod +r "$filename"
                     logger -t "$NAME" "List of macs [$filename] generated."
                 done
@@ -80,11 +81,16 @@ init () {
 	trap ':' TTIN
 	trap ':' TSTP
 
+	[[ -f "/var/run/$NAME.pid" ]] && echo "$NAME already in use." 1>&2 && exit 1
+	
 	umask 033
 	mkdir -p /var/nettenance &> /dev/null
 	cd /var/nettenance
-	[[ -f "/var/run/$NAME.pid" ]] && echo "$NAME already in use." 1>&2 && exit 1
 	echo "$BASHPID" > "/var/run/$NAME.pid"
+
+    # Ensure structure
+    mkdir -p /var/nettenance/scan &> /dev/null
+    mkdir -p /var/nettenance/known &> /dev/null
 
 	# Close standard fd
 	close-fds
