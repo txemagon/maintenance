@@ -21,7 +21,7 @@ install:
 	ln -sf `pwd`/usr/bin/remote-install /usr/bin/remote-install
 	ln -sf `pwd`/usr/bin/remote-installp /usr/bin/remote-installp
 	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/rcp-dir
-	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/seek
+	ln -sf `pwd`/usr/bin/seek /usr/bin/seek
 	ln -sf `pwd`/usr/bin/list-hosts /usr/bin/list-hosts
 	ln -sf `pwd`/usr/bin/make-booklet /usr/bin/make-booklet
 	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all

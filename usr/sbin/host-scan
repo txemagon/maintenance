@@ -45,6 +45,7 @@ host-scan-main_loop () {
 		for lst in /etc/nettenance/hosts/*; do
 		    local filename=global."${lst##*/}".macs
 		    list-macs -H "$lst"> "scan/$filename"
+		    chmod +r "scan/$filename"
             logger -t "$NAME" "List of macs [$filename] generated."
         done
 
@@ -54,7 +55,7 @@ host-scan-main_loop () {
 				for lst in "$home"/.nettenance/hosts/*; do
 					local filename="${home##*/}"."${lst##*/}".macs
 		            list-macs -H "$lst"> "scan/$filename"
-		            chmod +r "$filename"
+		            chmod +r "scan/$filename"
                     logger -t "$NAME" "List of macs [$filename] generated."
                 done
             fi
