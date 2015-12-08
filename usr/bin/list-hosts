@@ -23,7 +23,7 @@ VERSION=1.0
 display_usage () {
     cat <<EOF
 
-    $NTT_CMD_NAME v$VERSION  -  Lists only active hosts when there is a scanning
+    $NTT_CMD_NAME v$VERSION  -  Lists only active/known hosts when there is a scanning
                  service running. It list the file contents otherwise.
 
 USAGE:
@@ -44,11 +44,26 @@ OPTIONS:
           Each line of the host file is assumed to have just one IP or
           IP and MAC address (<TAB> separated).
 
+          When the file is not present in the above dirs then, the command
+          assumes that you are specifying the path to the file. In such manner,
+          it would be the same to write:
+
+            $NTT_CMD_NAME userhost.lst
+          that
+            $NTT_CMD_NAME ~/.nettenance/userhost.lst
+
+    -k, --known
+          Show all known hosts (gathered by the scanner over the time) instead
+          of active ones. Forces the program to look into
+          host-scan daemon results rather than in the provided file.
+
     -a, --all
-          Show IPs and MAC when present.
+          Show IPs and MAC when present. Forces the program to look into
+          host-scan daemon results rather than in the provided file.
 
     -m, --mac
-          Just show MACs.
+          Just show MACs. Forces the program to look into
+          host-scan daemon results rather than in the provided file.
 
     -h, --help
           Shows usage.
@@ -72,7 +87,7 @@ hostfile=userhost.lst
 
 
 # read the options
-TEMP=`getopt -o hVH:am --long help,version,hosts:,all,mac -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVH:amk --long help,version,hosts:,all,mac,known -n $NTT_CMD_NAME -- "$@"`
 
 eval set -- "$TEMP"
 
@@ -82,12 +97,16 @@ eval set -- "$TEMP"
 # 1: show ip
 # 2: show mac
 cutting=1
+
+dyn_dir=scan
+
 while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
         -V|--version) display_version; exit 0;;
         -a|--all) cutting=0; shift;;
         -m|--mac) cutting=2; shift;;
+        -k|--known) dyn_dir=known; known=1; shift;;
         -H|--hosts) case "$2" in
             "") shift 2 ;;
             *) hostfile=$2 ; shift 2 ;;
@@ -104,35 +123,50 @@ original=$(readlink -m $hostfile)
 original_path="$(dirname "$original")"
 original_file="$(basename "$original")"
 
-for whole_fn in /var/nettenance/scan/*.macs; do
-	f="${whole_fn##*/}"
-	f="${f%.macs}"
-	user="${f%%.*}"
-	f="${f#$user.}"
-	if [[ "$f" = "$original_file" ]]; then
-      if [[ "$user" = "global" ]]; then
-      	final_file="$whole_fn"
-      elif test $(echo "$original_path" | grep "$user"); then
-      	final_file="$whole_fn"
-      fi
-    fi
-done
+# $1: scan or known
+dynamic_file() {
+  local f user final_file
 
+    for whole_fn in /var/nettenance/$1/*.macs; do
+	    f="${whole_fn##*/}"
+	    f="${f%.macs}"
+	    user="${f%%.*}"
+	    f="${f#$user.}"
+	    if [[ "$f" = "$original_file" ]]; then
+          if [[ "$user" = "global" ]]; then
+      	    final_file="$whole_fn"
+          elif test $(echo "$original_path" | grep "$user"); then
+      	    final_file="$whole_fn"
+          fi
+        fi
+    done
+
+    echo "$final_file"
+}
 
 # Test RELOAD_TIME
 include_sanitized /etc/nettenance/host-scan.conf
 
-aged=0
-if [[ -d "/var/nettenance/scan" ]] && [[ -x "/var/nettenance/scan" ]] && [[ -f "$final_file" ]]; then
-  aged=$(( $(date +%s) - $(date +%s -r "$final_file") ))
-fi
+final_file="$( dynamic_file $dyn_dir )"
 
-if [ $cutting -ne 1 -o $RELOAD_TIME -gt $aged ]; then
-	hostfile="$final_file"
+hostfile="$(< "$hostfile")"
+if [ -z $known ]; then
+    aged=0
+    if [[ -d "/var/nettenance/scan" ]] && [[ -x "/var/nettenance/scan" ]] && [[ -f "$final_file" ]]; then
+      aged=$(( $(date +%s) - $(date +%s -r "$final_file") ))
+    fi
+
+    if [ -f "$final_file" ]; then
+        if [ $cutting -ne 1 ] || [ $RELOAD_TIME -gt $aged ]; then
+           hostfile=$(<"$final_file")
+        fi
+    fi
+else
+  hostfile=$( shatter -rd "$final_file" )
 fi
 
 if [ $cutting -eq 0 ]; then
-   cat "$hostfile" | sed -e /^$/d
+   cat <<< "$hostfile" | sed -e /^$/d
 else
-	cat "$hostfile" | cut -f$cutting | sed -e /^$/d
+	cat <<< "$hostfile" | cut -f$cutting | sed -e /^$/d
 fi

@@ -73,7 +73,7 @@ macfile=$(look_for $macfile HOST)
 check_existence_of $macfile
 
 
-for mac in $(list-hosts -m -H $macfile); do
+for mac in $(list-hosts -mkH $macfile); do
     etherwake $mac  &
 done
 

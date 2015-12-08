@@ -1,0 +1,128 @@
+#!/bin/bash
+# shatter
+
+# Dec, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Given a file, the file name is used as a directory name and
+# the first column of each file as a file name.
+
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Split a file into multiple files using file name
+        as the containing dir and the first line of the file as a file name.
+
+USAGE:
+    $NTT_CMD_NAME [<options>] <filename>
+
+OPTIONS:
+    -d, --dir=.
+          Specify the dir for destiny (normal mode) or for
+          input (reverse mode). Defaults to current.
+
+    -r, --reverse
+          Just show MACs.
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+AIM:
+
+   $NTT_CMD_NAME was designed to achieve the maximum information
+   available for a net where scans were performed periodically in
+   an evironment where some hosts tend to disappear over time.
+   Splitting the scan file replaces new information without deleting
+   the missing one.
+
+
+EXAMPLE: $NTT_CMD_NAME -o /var/nettenance/known ../tmp/list.macs
+
+    If list.macs contains
+
+        192.168.1.1 01:01:01:01 In the summer time
+        192.168.1.2 02:02:02:02 when the weather is fine
+
+    We get inside list.macs local directory the files
+        192.168.1.1 and 192.168.1.2
+
+    containing:
+        01:01:01:01 In the summer time
+    and
+        192.168.1.2 02:02:02:02 when the weather is fine
+    respectively.
+
+EOF
+}
+
+DIR="."                # Default outdir is current dir.
+REVERSE=0
+
+# read the options
+TEMP=`getopt -o hVd:r --long help,version,dir:,reverse -n $NTT_CMD_NAME -- "$@"`
+
+eval set -- "$TEMP"
+
+# extract options and their arguments into variables.
+
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        -r|--reverse) REVERSE=1; shift ;;
+        -d|--dir) case "$2" in
+            "") shift 2 ;;
+            *) DIR=${2%/} ; shift 2 ;;
+        esac ;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+#  $1: SRC_FILE (It can be absolute or relative path)
+if [ $REVERSE -eq 0 ]; then
+
+
+    ensure_args 1 $#
+    check_existence_of $1
+    FILE_NAME=${1##*/}      # Get rid of the path
+    TARGET_DIR="$DIR/$FILE_NAME"
+
+    ! [ -d  "$TARGET_DIR" ] && mkdir -p "$TARGET_DIR"
+    ! [ -d  "$TARGET_DIR" ] && echo "Couldn't find $TARGET_DIR" >&2 && exit 1
+
+    while read -r line; do
+        file_name=$(echo "$line" | cut -f1)
+        echo "$line" | cut -f2- > "$TARGET_DIR/$file_name"
+    done < "$1"
+
+
+
+else # reverse mode
+
+
+    exec 3>&1
+	if [ -e "$1" ]; then
+	    echo "$1 already exists. Output redirected to stdout." >&2
+	    exec 3>&1
+	    recovering=1
+	else
+		file=${1:--}
+	    ! [[ "$file" = "-" ]] && exec 3>"$1"
+	fi
+
+	paste <(ls -1 "$DIR") <(cat "$DIR/"*) >&3
+
+    [ -n "$recovering" ] && exit 2
+    exec 3>&-
+
+fi
+    exit 0

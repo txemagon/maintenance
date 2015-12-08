@@ -44,6 +44,12 @@ OPTIONS:
           respectively. It is a good idea to keep separate lists of IPs under ~/.nettenance/hosts
           and link ~/.nettenance/userhost.lst to point to the desired environment.
 
+    -p, --parallel
+          Show each host in a gnome-terminal tab.
+
+    -i, --interactive
+          Open ssh in a way that the user can answer questions with the terminal.
+
     -h, --help
           Shows usage.
 
@@ -89,3 +95,29 @@ for ip in $(list-hosts -H $hostfile); do
     ssh root@$ip "bash -s" < $maneuver &
 done
 
+# dop
+command=$terminal
+for ip in $(list-hosts -H $hostfile); do
+  command+=$option$S
+  command+="ssh root@$ip 'bash -s' < $maneuver"
+  command+=$S
+done
+
+eval $command
+
+
+# install
+for ip in $(list-hosts -H $hostfile); do
+    toilet -f term -F border --gay $ip
+    ssh -t root@$ip "$(<$maneuver)"
+done
+
+# install p
+command=$terminal
+for ip in $(list-hosts -H $hostfile); do
+  command+=$option$S
+  command+="ssh -t root@$ip $( < $maneuver) "
+  command+=$S
+done
+
+eval $command

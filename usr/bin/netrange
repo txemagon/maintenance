@@ -1,0 +1,61 @@
+#!/bin/bash
+# netrange
+
+# Dec, 2015, txema.gonz@gmail.com
+# GNU GENERAL PUBLIC LICENSE, Version 2
+
+# Print a range of ip's
+
+VERSION=1.0
+
+. /usr/share/nettenance/general.sh
+
+
+display_usage () {
+    cat <<EOF
+
+    $NTT_CMD_NAME v$VERSION  -  Displays an ip range.
+
+USAGE:
+    $NTT_CMD_NAME [<options>] <range>
+
+OPTIONS:
+
+    -h, --help
+          Shows usage.
+
+    -V, --version
+          Displays program version.
+
+EXAMPLE: $NTT_CMD_NAME 192.168.1.0/30
+
+         192.168.1.0
+         192.168.1.1
+         192.168.1.2
+         192.168.1.3
+
+EOF
+}
+
+# read the options
+TEMP=`getopt -o hV --long help,version -n $NTT_CMD_NAME -- "$@"`
+
+eval set -- "$TEMP"
+
+while true ; do
+    case "$1" in
+        -h|--help) display_usage; exit 0 ;;
+        -V|--version) display_version; exit 0;;
+        --) shift ; break ;;
+        *) echo "Internal error!" >&2; exit 1 ;;
+    esac
+done
+
+ensure_args 1 $#
+
+ip=${1%%/*}
+mask=${1##$ip}
+mask=${mask##*/}
+mask=${mask:-32}
+
+netrange $ip $mask

@@ -22,6 +22,8 @@ install:
 	ln -sf `pwd`/usr/bin/remote-installp /usr/bin/remote-installp
 	ln -sf `pwd`/usr/bin/rcp-dir /usr/bin/rcp-dir
 	ln -sf `pwd`/usr/bin/seek /usr/bin/seek
+	ln -sf `pwd`/usr/bin/shatter /usr/bin/shatter
+	ln -sf `pwd`/usr/bin/netrange /usr/bin/netrange
 	ln -sf `pwd`/usr/bin/list-hosts /usr/bin/list-hosts
 	ln -sf `pwd`/usr/bin/make-booklet /usr/bin/make-booklet
 	ln -sf `pwd`/usr/sbin/push-all /usr/sbin/push-all
@@ -39,9 +41,9 @@ install:
 	mkdir -p /var/nettenance
 	chmod +x /var/nettenance
 	mkdir -p /var/nettenance/scan
-	chmod +x /var/nettenance/scan
+	chmod +rx /var/nettenance/scan
 	mkdir -p /var/nettenance/known
-	chmod +x /var/nettenance/known
+	chmod +rx /var/nettenance/known
 	cp etc/init.d/host-scan /etc/init.d/
 
 uninstall:
@@ -52,6 +54,8 @@ uninstall:
 	rm /usr/bin/remote-installp
 	rm /usr/bin/rcp-dir
 	rm /usr/bin/seek
+	rm /usr/bin/shatter
+	rm /usr/bin/netrange
 	rm /usr/bin/list-hosts
 	rm /usr/bin/make-booklet
 	rm /usr/sbin/push-all
