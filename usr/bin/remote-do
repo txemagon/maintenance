@@ -63,9 +63,12 @@ EOF
 
 hostfile=userhost.lst
 
+mode=0
+PARALLEL=1
+INTERACTIVE=2
 
 # read the options
-TEMP=`getopt -o hVH: --long help,version,hosts: -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVH:pi --long help,version,hosts:,parallel,interactive -n $NTT_CMD_NAME -- "$@"`
 
 eval set -- "$TEMP"
 
@@ -75,6 +78,8 @@ while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
         -V|--version) display_version; exit 0;;
+        -p|--parallel) mode=$(( $mode | PARALLEL )) ; shift ;;
+        -i|--interactive) mode=$(( $mode | INTERACTIVE )) ; shift ;;
         -H|--hosts) case "$2" in
             "") shift 2 ;;
             *) hostfile=$2 ; shift 2 ;;
@@ -90,34 +95,45 @@ check_existence_of $hostfile
 
 maneuver=$(look_for $1 MNVR)
 
-for ip in $(list-hosts -H $hostfile); do
-    toilet -f term -F border --gay $ip
-    ssh root@$ip "bash -s" < $maneuver &
-done
 
-# dop
-command=$terminal
-for ip in $(list-hosts -H $hostfile); do
-  command+=$option$S
-  command+="ssh root@$ip 'bash -s' < $maneuver"
-  command+=$S
-done
+terminal="gnome-terminal"
+option=" --tab -e "
+s="'"
+S="\""
+case "$mode" in
+  0|NORMAL) # do
+    for ip in $(list-hosts -H $hostfile); do
+       toilet -f term -F border --gay $ip
+       ssh root@$ip "bash -s" < $maneuver &
+    done
+    ;;
 
-eval $command
+  1|PARALLEL) # dop
+     command=$terminal
+     for ip in $(list-hosts -H $hostfile); do
+       command+=$option$S
+       command+="ssh root@$ip 'bash -s' < $maneuver"
+       command+=$S
+     done
+     
+     eval $command
+     ;;
 
+  2|INTERACTIVE) # install
+    for ip in $(list-hosts -H $hostfile); do
+        toilet -f term -F border --gay $ip
+        ssh -tX root@$ip "$(<$maneuver)"
+    done
+    ;;
 
-# install
-for ip in $(list-hosts -H $hostfile); do
-    toilet -f term -F border --gay $ip
-    ssh -t root@$ip "$(<$maneuver)"
-done
-
-# install p
-command=$terminal
-for ip in $(list-hosts -H $hostfile); do
-  command+=$option$S
-  command+="ssh -t root@$ip $( < $maneuver) "
-  command+=$S
-done
-
-eval $command
+  3|PARALLEL_INTERACTIVE) # install p
+    command=$terminal
+    for ip in $(list-hosts -H $hostfile); do
+      command+=$option$S
+      command+="ssh -tX root@$ip $( < $maneuver) "
+      command+=$S
+    done
+    
+    eval $command
+    ;;
+esac
