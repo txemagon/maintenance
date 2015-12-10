@@ -85,9 +85,9 @@ _file_repo()
             ;;
         *)
             if [[ "$cur" == --* ]] ; then
-                COMPREPLY=( $( compgen -W '--help --version --hosts' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '--help --version --hosts --all --users' -- "$cur" ) )
             elif [[ "$cur" == -* ]] ; then
-                COMPREPLY=( $( compgen -W '-h -V -H' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '-h -V -H -a -u' -- "$cur" ) )
             else
                 COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_REPO; ls $NTT_LOC_REPO) 2>/dev/null`" -- "$cur" ) )
             fi

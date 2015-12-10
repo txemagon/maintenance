@@ -31,6 +31,12 @@ USAGE:
     $NTT_SYS_REPO or in a per user configuration inside
     $NTT_LOC_REPO
 
+SUBTLETIES:
+    Only syste wide files are pushed by default. Whenever you want to store
+    per user configuration save it under a directory called: ~ 
+    Exactly. Tilde. One single character. As long as ~ is a metacharacter
+    remember to escape it when working from comand line ( mkdir \~ ).
+
 OPTIONS:
     -H, --hosts:
           -H {<user_host_file>=userhost.lst}
@@ -42,6 +48,12 @@ OPTIONS:
 
           respectively. It is a good idea to keep separate lists of IPs under ~/.nettenance/hosts
           and link ~/.nettenance/userhost.lst to point to the desired environment.
+
+    -a, --all:
+          Push system wide and per user files.
+
+    -u, --users:
+          Just push user files (under ~ dir).
 
     -h, --help
           Shows usage.
@@ -58,16 +70,18 @@ hostfile=userhost.lst
 
 
 # read the options
-TEMP=`getopt -o hVH: --long help,version,hosts: -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVH:au --long help,version,hosts:,all,users -n $NTT_CMD_NAME -- "$@"`
 
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
-
+SCOPE=0
 while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
         -V|--version) display_version; exit 0;;
+        -u|--users) SCOPE=$(( $SCOPE + 1)); shift ;;
+        -a|--all) SCOPE=2; shift ;;
         -H|--hosts) case "$2" in
             "") shift 2 ;;
             *) hostfile=$2 ; shift 2 ;;
@@ -95,6 +109,21 @@ fi
 
 echo "Starting..."
 for ip in $(list-hosts -H $hostfile); do
+
    toilet -f term -F border --gay  "$ip"
-   rsync -avz  $repository/ root@$ip:/
+
+   if [ $SCOPE -ne 1 ]; then
+        echo "SYSTEM WIDE Copy"
+        rsync --exclude \~ -avz  $repository/ root@$ip:/
+   fi
+
+   if [ $SCOPE -ne 0 ]; then
+      for dir in $(ssh root@$ip "getent passwd | grep /home | cut -d: -f6"); do
+          if ssh root@$ip "ls $dir" &> /dev/null; then 
+            echo "PER USER Copy"
+             echo "Copying $ip => $dir. "
+             rsync --dry-run -avz $repository/\~ root@$ip:"$dir"
+          fi
+       done
+   fi
 done

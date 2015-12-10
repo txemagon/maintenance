@@ -6,8 +6,10 @@ customize:
 	mkdir ~/.nettenance
 	mkdir ~/.nettenance/hosts
 	mkdir ~/.nettenance/maneuvers
+	mkdir ~/.nettenance/repository
 
 decustomize:
+	rmdir ~/.nettenance/repository
 	rmdir ~/.nettenance/hosts
 	rmdir ~/.nettenance/maneuvers
 	rmdir ~/.nettenance
