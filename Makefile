@@ -6,15 +6,13 @@ customize:
 	mkdir ~/.nettenance
 	mkdir ~/.nettenance/hosts
 	mkdir ~/.nettenance/maneuvers
-	mkdir ~/.nettenance/repository
 
 decustomize:
 	rmdir ~/.nettenance/hosts
 	rmdir ~/.nettenance/maneuvers
-	rmdir ~/.nettenance/repository
 	rmdir ~/.nettenance
 
-install:
+install-develop:
 	ln -sf `pwd`/usr/bin/do-in /usr/bin/do-in
 	ln -sf `pwd`/usr/bin/remote-do /usr/bin/remote-do
 	ln -sf `pwd`/usr/bin/remote-dop /usr/bin/remote-dop
@@ -31,6 +29,39 @@ install:
 	ln -sf `pwd`/usr/sbin/list-macs /usr/sbin/list-macs
 	ln -sf `pwd`/usr/sbin/awake /usr/sbin/awake
 	ln -sf `pwd`/usr/sbin/host-scan /usr/sbin/host-scan
+	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
+	mkdir -p /etc/nettenance
+	cp -R etc/nettenance/* /etc/nettenance
+	mkdir -p /usr/share/nettenance
+	cp -R usr/share/nettenance/* /usr/share/nettenance
+	mkdir -p /srv/nettenance/repository
+	cp -R srv/nettenance/repository/* /srv/nettenance/repository
+	mkdir -p /var/nettenance
+	chmod +x /var/nettenance
+	mkdir -p /var/nettenance/scan
+	chmod +rx /var/nettenance/scan
+	mkdir -p /var/nettenance/known
+	chmod +rx /var/nettenance/known
+	cp etc/init.d/host-scan /etc/init.d/
+
+
+install:
+	cp usr/bin/do-in /usr/bin/do-in
+	cp usr/bin/remote-do /usr/bin/remote-do
+	cp usr/bin/remote-dop /usr/bin/remote-dop
+	cp usr/bin/remote-install /usr/bin/remote-install
+	cp usr/bin/remote-installp /usr/bin/remote-installp
+	cp usr/bin/rcp-dir /usr/bin/rcp-dir
+	cp usr/bin/seek /usr/bin/seek
+	cp usr/bin/shatter /usr/bin/shatter
+	cp usr/bin/netrange /usr/bin/netrange
+	cp usr/bin/list-hosts /usr/bin/list-hosts
+	cp usr/bin/make-booklet /usr/bin/make-booklet
+	cp usr/sbin/push-all /usr/sbin/push-all
+	cp usr/sbin/copy-credentials /usr/sbin/copy-credentials
+	cp usr/sbin/list-macs /usr/sbin/list-macs
+	cp usr/sbin/awake /usr/sbin/awake
+	cp usr/sbin/host-scan /usr/sbin/host-scan
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance

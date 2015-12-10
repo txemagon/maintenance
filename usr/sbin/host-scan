@@ -61,7 +61,7 @@ host-scan-main_loop () {
 
 		# Per user host files scan
 		for home in $(home_dirs); do
-			if [[ -d "$home/.nettenance/hosts" ]]; then
+			if [[ -d "$home/.nettenance/hosts" ]] && ! [ "$( ls  $home/.nettenance/hosts )" ]; then
 				scan_files "$home"/.nettenance "${home##*/}"
 			fi
 		done

@@ -41,7 +41,7 @@ OPTIONS:
     -c, --compressed
           Leave the directory compressed on target machine.
 
-   -t, --threads  Default to 5.
+    -t, --threads  Default to 5.
          Specify number of compressing threads.
 
 EXAMPLES:
