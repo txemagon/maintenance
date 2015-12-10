@@ -10,3 +10,4 @@ chmod +x qt-unified-linux-x64-online.run
 cd ..
 rm -rf qttemp
 
+

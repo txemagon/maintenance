@@ -53,9 +53,9 @@ _file_mnvr()
             ;;
         *)
             if [[ "$cur" == --* ]] ; then
-                COMPREPLY=( $( compgen -W '--help --version --hosts' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '--help --version --hosts --parallel --interactive' -- "$cur" ) )
             elif [[ "$cur" == -* ]] ; then
-                COMPREPLY=( $( compgen -W '-h -V -H' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '-h -V -H -p -i' -- "$cur" ) )
             else
                 COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) )
             fi
@@ -67,9 +67,6 @@ _file_mnvr()
 } &&
 complete -F _file_mnvr remote-do
 
-have remote-dop && complete -F _file_mnvr remote-dop
-have remote-install && complete -F _file_mnvr remote-install
-have remote-installp && complete -F _file_mnvr remote-installp
 
 have push-all &&
 _file_repo()

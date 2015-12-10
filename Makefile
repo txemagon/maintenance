@@ -46,22 +46,19 @@ install-develop:
 
 
 install:
-	cp usr/bin/do-in /usr/bin/do-in
-	cp usr/bin/remote-do /usr/bin/remote-do
-	cp usr/bin/remote-dop /usr/bin/remote-dop
-	cp usr/bin/remote-install /usr/bin/remote-install
-	cp usr/bin/remote-installp /usr/bin/remote-installp
-	cp usr/bin/rcp-dir /usr/bin/rcp-dir
-	cp usr/bin/seek /usr/bin/seek
-	cp usr/bin/shatter /usr/bin/shatter
-	cp usr/bin/netrange /usr/bin/netrange
-	cp usr/bin/list-hosts /usr/bin/list-hosts
-	cp usr/bin/make-booklet /usr/bin/make-booklet
-	cp usr/sbin/push-all /usr/sbin/push-all
-	cp usr/sbin/copy-credentials /usr/sbin/copy-credentials
-	cp usr/sbin/list-macs /usr/sbin/list-macs
-	cp usr/sbin/awake /usr/sbin/awake
-	cp usr/sbin/host-scan /usr/sbin/host-scan
+	cp -f usr/bin/do-in /usr/bin/do-in
+	cp -f usr/bin/remote-do /usr/bin/remote-do
+	cp -f usr/bin/rcp-dir /usr/bin/rcp-dir
+	cp -f usr/bin/seek /usr/bin/seek
+	cp -f usr/bin/shatter /usr/bin/shatter
+	cp -f usr/bin/netrange /usr/bin/netrange
+	cp -f usr/bin/list-hosts /usr/bin/list-hosts
+	cp -f usr/bin/make-booklet /usr/bin/make-booklet
+	cp -f usr/sbin/push-all /usr/sbin/push-all
+	cp -f usr/sbin/copy-credentials /usr/sbin/copy-credentials
+	cp -f usr/sbin/list-macs /usr/sbin/list-macs
+	cp -f usr/sbin/awake /usr/sbin/awake
+	cp -f usr/sbin/host-scan /usr/sbin/host-scan
 	cp etc/bash_completion.d/nettenance /etc/bash_completion.d/
 	mkdir -p /etc/nettenance
 	cp -R etc/nettenance/* /etc/nettenance
@@ -75,14 +72,11 @@ install:
 	chmod +rx /var/nettenance/scan
 	mkdir -p /var/nettenance/known
 	chmod +rx /var/nettenance/known
-	cp etc/init.d/host-scan /etc/init.d/
+	cp etc/init.d/host-scan /etc/init.d/host-scan
 
 uninstall:
 	rm /usr/bin/do-in
 	rm /usr/bin/remote-do
-	rm /usr/bin/remote-dop
-	rm /usr/bin/remote-install
-	rm /usr/bin/remote-installp
 	rm /usr/bin/rcp-dir
 	rm /usr/bin/seek
 	rm /usr/bin/shatter
@@ -98,4 +92,4 @@ uninstall:
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
 	rm -rf /var/nettenance
-	rm etc/init.d/host-scan
+	rm /etc/init.d/host-scan

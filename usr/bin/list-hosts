@@ -166,7 +166,7 @@ else
 fi
 
 if [ $cutting -eq 0 ]; then
-   cat <<< "$hostfile" | sed -e /^$/d
+   cat <<< "$hostfile" | sed -e /^$/d | sort -un
 else
-	cat <<< "$hostfile" | cut -f$cutting | sed -e /^$/d
+	cat <<< "$hostfile" | cut -f$cutting | sed -e /^$/d | sort -un
 fi
