@@ -74,7 +74,10 @@ install:
 	chmod +rx /var/nettenance/scan
 	mkdir -p /var/nettenance/known
 	chmod +rx /var/nettenance/known
+	
 	cp etc/init.d/host-scan /etc/init.d/host-scan
+	/etc/init.d/host-scan start
+	update-rc.d host-scan defaults
 
 uninstall:
 	rm /usr/bin/do-in
@@ -94,4 +97,6 @@ uninstall:
 	rm -rf /etc/nettenance
 	rm -rf /usr/share/nettenance
 	rm -rf /var/nettenance
+	/etc/init.d/host-scan stop
+	update-rc.d -f host-scan remove
 	rm /etc/init.d/host-scan

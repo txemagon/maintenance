@@ -129,10 +129,10 @@ terminal_command(){
 
 ## Main Program
 
-nc_target_ip=$(my_ip_for ${target_uri[host]})
-nc_target_ip=${nc_target_ip:-localhost}
+nc_source_ip=$(my_ip_for ${target_uri[host]})
+nc_source_ip=${nc_target_ip:-localhost}
 
-prepare_script setup_rcp-dir_src.sh "${src_uri[path]}" $nc_target_ip > .sourcehost_script
+prepare_script setup_rcp-dir_src.sh "${src_uri[path]}" ${target_uri[host]} > .sourcehost_script
 prepare_script setup_rcp_target.sh  "${target_uri[path]}"     > .targethost_script
 
 if [ $compressed -eq 1 ]; then
