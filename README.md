@@ -1,6 +1,6 @@
 # Nettenance
 
-Nettenance stands for Net Maintenance, and it was developed as a collection of bash scripts to manage a pool of computers.
+Nettenance stands for Net Maintenance, and it was developed as a collection of bash (and only bash) scripts to manage a pool of computers.
 
 ## Installation
 
@@ -74,6 +74,9 @@ When
 
 ## Usage
 
+Here you can find a simple description of commands. Use --help option for further details.
+Use tab key for autocompletion.
+
 ### Non root commands
 
 For remote administration:
@@ -83,6 +86,17 @@ For remote administration:
 | remote-do | _Executes a maneuver on all remote computers._ |
 | do-in | _Execute a maneuver on a single remote host._ |
 
+This two commands are based upon the concept of _maneuver_. A maneuver is a file (you can dump from your history) where
+a installation procedure is written down. They can be found under ~/.nettenance/maneuvers or /etc/nettenance/maneuvers.
+
+Some examples:
+
+```bash
+remote-do -p install-vnc
+do-in `seek username` execute_as username firefox
+```
+
+General utilities:
 
 | command | Description |
 |--------:|:------------|
@@ -90,9 +104,29 @@ For remote administration:
 | make-booklet | _Create a pdf reordering pages to be fold every n sheets of paper_ |
 | list-hosts | _List the hosts of the active set of computers._ |
 
+Notes:
+* rcp-dir boost dir copies using netcat and five compressing threads. It uses scp syntax.
+* list-hosts list the active hosts whenever the host-scan daemon is activated and no other options are specified. It can also be used to list known macs instead of IPs.
+ 
+Some examples:
+
+```bash
+rcp-dir ~me/some_dir root@1.2.3.4:/var/www
+```
+
+Auxiliary tools:
+
 | command | Description |
 |--------:|:------------|
-| seek | _Looks for a given user inside the active set._ |
+| seek | _Looks for a given user inside the active host set._ |
 | netrange | _Prints all IP numbers within a net range._ |
-| shatter | _Splits a file into separate files where first field would be the name of the file. _|
+| shatter | _Splits a file into separate files where first field would be the name of the file._ |
 
+### Root commands
+
+| command | Description |
+|--------:|:------------|
+| awake             | _Awake via ethernet a list of computers._  |
+| copy-credentials  |  _Copy ssh credentials to the active set._ |
+| host-scan         |  _Daemons scanning the net to discover active computers and their macs_ |
+| push-all          |  _Push a directory tree into remote computers. Home dir (~) is pushed into every user dir._ |
