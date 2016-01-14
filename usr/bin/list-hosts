@@ -150,6 +150,7 @@ include_sanitized /etc/nettenance/host-scan.conf
 final_file="$( dynamic_file $dyn_dir )"
 
 hostfile="$(< "$hostfile")"
+
 if [ -z $known ]; then
     aged=0
     if [[ -d "/var/nettenance/scan" ]] && [[ -x "/var/nettenance/scan" ]] && [[ -f "$final_file" ]]; then
@@ -166,7 +167,7 @@ else
 fi
 
 if [ $cutting -eq 0 ]; then
-   cat <<< "$hostfile" | sed -e /^$/d | sort -un
+   cat <<< "$hostfile" | sed -e /^$/d | sort -n | uniq
 else
-	cat <<< "$hostfile" | cut -f$cutting | sed -e /^$/d | sort -un
+	cat <<< "$hostfile" | cut -f$cutting | sed -e /^$/d | sort -n | uniq
 fi

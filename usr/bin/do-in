@@ -39,6 +39,16 @@ OPTIONS:
     -V, --version
           Displays program version.
 
+    -s, --skip
+          Skip validating the existence of the maneuver file. Which indeed is useful
+          when you want to provide the command as a option. The following example shows
+          who is logged in 192.168.1.3:
+
+              $NTT_CMD_NAME -s 192.168.1.3 <(echo who)
+
+          Note about the use of process substitution <(), which is neccesary to convert 
+          output to file (descriptor).
+
 EXAMPLE: $NTT_CMD_NAME localhost greet
 
 EOF
@@ -46,7 +56,7 @@ EOF
 
 
 # read the options
-TEMP=`getopt -o hV --long help,version -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVs --long help,version,skip -n $NTT_CMD_NAME -- "$@"`
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
@@ -54,6 +64,7 @@ while true ; do
     case "$1" in
         -h|--help) display_usage; exit 0 ;;
         -V|--version) display_version; exit 0;;
+        -s|--skip) shift; skip=1;;
         --) shift ; break ;;
         *) echo "Internal error!" >&2; exit 1 ;;
     esac
@@ -66,26 +77,9 @@ shift
 maneuver=$1
 shift
 
-if [[ -f "$NTT_LOC_MNVR/$maneuver" ]];
-then
-    maneuver=$NTT_LOC_MNVR/$maneuver
-elif [[ -f $NTT_SYS_MNVR/$maneuver ]];
-then
-    maneuver=$NTT_SYS_MNVR/$maneuver
-else
-    cat <<EOF >&2
-
-
-    Maneuver not found.
-
-$maneuver not found neither in any of the following:
-
-    - $NTT_LOC_MNVR
-    - $NTT_SYS_MNVR
-
-EOF
-    display_usage >&2
-    exit 2
+if [ -z "$skip" ]; then
+  maneuver=$(look_for $maneuver MNVR)
+  check_existence_of "$maneuver"
 fi
 
 maneuver="$(<$maneuver)" ## Load maneuver file as whole.
@@ -101,4 +95,4 @@ do
     shift
 done
 
-ssh -Xt $sshing $maneuver
+ssh -Xt $sshing $maneuver 2> /dev/null

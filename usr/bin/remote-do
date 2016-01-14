@@ -50,6 +50,16 @@ OPTIONS:
     -i, --interactive
           Open ssh in a way that the user can answer questions with the terminal.
 
+    -s, --skip
+          Skip validating the existence of the maneuver file. Which indeed is useful
+          when you want to provide the command as a option. The following example shows
+          who is logged in all active computers:
+
+              $NTT_CMD_NAME -s <(echo who)
+
+          Note about the use of process substitution <(), which is neccesary to convert 
+          output to file (descriptor).
+
     -h, --help
           Shows usage.
 
@@ -68,7 +78,7 @@ PARALLEL=1
 INTERACTIVE=2
 
 # read the options
-TEMP=`getopt -o hVH:pi --long help,version,hosts:,parallel,interactive -n $NTT_CMD_NAME -- "$@"`
+TEMP=`getopt -o hVH:pis --long help,version,hosts:,parallel,interactive,skip -n $NTT_CMD_NAME -- "$@"`
 
 eval set -- "$TEMP"
 
@@ -80,6 +90,7 @@ while true ; do
         -V|--version) display_version; exit 0;;
         -p|--parallel) mode=$(( $mode | PARALLEL )) ; shift ;;
         -i|--interactive) mode=$(( $mode | INTERACTIVE )) ; shift ;;
+        -s|--skip) shift; skip=1;;
         -H|--hosts) case "$2" in
             "") shift 2 ;;
             *) hostfile=$2 ; shift 2 ;;
@@ -93,8 +104,12 @@ hostfile=$(look_for $hostfile HOST)
 ensure_args 1 $#
 check_existence_of $hostfile
 
-maneuver=$(look_for $1 MNVR)
+maneuver=$1
 
+if [ -z "$skip" ]; then
+  maneuver=$(look_for $maneuver MNVR)
+  check_existence_of "$maneuver"
+fi
 
 terminal="gnome-terminal"
 option=" --tab -e "

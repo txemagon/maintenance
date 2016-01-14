@@ -20,8 +20,10 @@ _do_in()
 #            return 0
 #            ;;
 
-    if [[ "$cur" == -* ]] ; then
-        COMPREPLY=( $( compgen -W '-h -V' -- "$cur" ) )
+    if [[ "$cur" == --* ]] ; then
+        COMPREPLY=( $( compgen -W '--help --version --skip' -- "$cur" ) )
+    elif [[ "$cur" == -* ]] ; then
+        COMPREPLY=( $( compgen -W '-h -V -s' -- "$cur" ) )
     else
          case $COMP_CWORD in
              1) _known_hosts ;;
@@ -53,9 +55,9 @@ _file_mnvr()
             ;;
         *)
             if [[ "$cur" == --* ]] ; then
-                COMPREPLY=( $( compgen -W '--help --version --hosts --parallel --interactive' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '--help --version --hosts --parallel --interactive --skip' -- "$cur" ) )
             elif [[ "$cur" == -* ]] ; then
-                COMPREPLY=( $( compgen -W '-h -V -H -p -i' -- "$cur" ) )
+                COMPREPLY=( $( compgen -W '-h -V -H -p -i -s' -- "$cur" ) )
             else
                 COMPREPLY=( $( compgen -W "`(ls $NTT_SYS_MNVR; ls $NTT_LOC_MNVR) 2>/dev/null`" -- "$cur" ) )
             fi

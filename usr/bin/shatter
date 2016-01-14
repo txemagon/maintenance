@@ -119,7 +119,7 @@ else # reverse mode
 	    ! [[ "$file" = "-" ]] && exec 3>"$1"
 	fi
 
-	paste <(ls -1 "$DIR") <(cat "$DIR/"*) >&3
+	paste <(ls -1 "$DIR") <(cat "$DIR/"*) | sort -n >&3
 
     [ -n "$recovering" ] && exit 2
     exec 3>&-
