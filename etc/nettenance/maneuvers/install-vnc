@@ -1,3 +1,6 @@
+#!/bin/bash
+# install-vnc
+
 apt-get install -y x11vnc
 
 x11vnc -storepasswd imtheboss /etc/x11vnc.pass

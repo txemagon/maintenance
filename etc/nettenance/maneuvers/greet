@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # greet
 
 echo "Hi. I\'m up and running."
