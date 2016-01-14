@@ -32,7 +32,7 @@ look_for () {
 
 check_existence_of () {
 
-    local target=$1
+    local target=$(readlink -m $1)
 
     if [[ ! -f $target ]];
     then
