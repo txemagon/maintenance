@@ -1,17 +1,39 @@
 #!/bin/bash
 # ldap
 
+# groupadd -f students
+
 apt-get update
 apt-get install libpam-ldap nscd -y
 
 # Something went wrong?
 # dpkg-reconfigure ldap-auth-config
 
-sed -i 's/compat/compat ldap/' /etc/nsswitch.conf
+# sed -i 's/compat/compat ldap/' /etc/nsswitch.conf
+auth-client-config -t nss -p lac_ldap
+
+cat <<EOL >/usr/share/pam-configs/mkhomedir
+Name: activate mkhomedir
+Default: yes
+Priority: 900
+Session-Type: Additional
+Session:
+        required                        pam_mkhomedir.so umask=0022 skel=/etc/skel
+EOL
+
+pam-auth-update
+
+
 echo "session required    pam_mkhomedir.so skel=/etc/skel umask=0022" >> /etc/pam.d/common-session
 
-/etc/init.d/nscd restart
+cat <<EOL >> /etc/ldap.conf
+nss_base_passwd ou=primero,ou=smyr,ou=students,dc=salesianosdosa,dc=com
+nss_base_shadow ou=primero,ou=smyr,ou=students,dc=salesianosdosa,dc=com
+nss_base_group ou=groups,dc=salesianosdosa,dc=com
+nss_initgroups_ignoreusers avahi,avahi-autoipd,backup,bin,colord,daemon,debian-spamd,dnsmasq,games,gdm,geoclue,gnats,hplip,irc,kernoops,libuuid,lightdm,list,lp,mail,man,messagebus,news,proxy,pulse,root,rtkit,saned,speech-dispatcher,sshd,sync,sys,syslog,usbmux,uucp,whoopsie,www-data
+EOL
 
+/etc/init.d/nscd restart
 
 
 
